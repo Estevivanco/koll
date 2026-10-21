@@ -1,9 +1,10 @@
 import { readFile } from "node:fs/promises";
 import { parseSwedbank } from "./swedbank.js";
+import { ensureSchema, saveTransactions, pool } from "./db.js";
 
 const path = process.argv[2];
 if (!path) {
-  console.error("Usage: npx tsx packages/importer/src/index.ts <file.csv>");
+  console.error("Usage: npx tsx --env-file=.env packages/importer/src/index.ts <file.csv>");
   process.exit(1);
 }
 
@@ -17,5 +18,12 @@ if (text.includes("\uFFFD")) {
 }
 
 const transactions = parseSwedbank(text);
-console.log(`${transactions.length} transactions`);
-console.table(transactions.slice(0, 5));
+
+try {
+  await ensureSchema();
+  const inserted = await saveTransactions(transactions);
+  console.log(`${transactions.length} read, ${inserted} new, ${transactions.length - inserted} already there`);
+} finally {
+  // Runs even if something above threw, so the connection never stays open
+  await pool.end();
+}

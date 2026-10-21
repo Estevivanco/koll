@@ -4,6 +4,10 @@
     "type": "module",
     "dependencies": {
         "@koll/shared": "*",
-        "csv-parse": "^7.0.3"
+        "csv-parse": "^7.0.3",
+        "pg": "^8.23.1"
+    },
+    "devDependencies": {
+        "@types/pg": "^8.23.1"
     }
 }
