@@ -10,7 +10,10 @@ if (!path) {
 const buffer = await readFile(path);
 let text = new TextDecoder("utf-8").decode(buffer);
 if (text.includes("\uFFFD")) {
-  text = new TextDecoder("windows-1252").decode(buffer); // fixes å ä ö
+  // A fresh export saved as windows-1252 decodes correctly this way. But if the "�" is
+  // already baked into the file, windows-1252 turns it into "ï¿½", so keep the UTF-8 text.
+  const latin = new TextDecoder("windows-1252").decode(buffer);
+  if (!latin.includes("ï¿½")) text = latin;
 }
 
 const transactions = parseSwedbank(text);
