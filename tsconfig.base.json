@@ -1,10 +1,13 @@
 {
     "compilerOptions": {
         "target": "ES2022",
+        // NodeNext matches how Node resolves ESM: relative imports need a .js extension
         "module": "NodeNext",
         "moduleResolution": "NodeNext",
+        // Turns on the whole family of strict checks (null checks, no implicit any, ...)
         "strict": true,
         "esModuleInterop": true,
+        // Don't type-check .d.ts files from node_modules; faster and avoids third-party noise
         "skipLibCheck": true
     }
 }

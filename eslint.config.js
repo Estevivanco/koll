@@ -1,8 +1,11 @@
-import eslint from "@eslint/js";
-import tseslint from "typescript-eslint";
+import js from "@eslint/js"
+import tseslint from "typescript-eslint"
+import {defineConfig} from "eslint/config"
 
-export default tseslint.config(
-    { ignores: ["**/dist/", "**/node_modules/"] },
-    eslint.configs.recommended,
+export default defineConfig(
+    js.configs.recommended,
     tseslint.configs.recommended,
-);
+    {
+        ignores: ["**/dist/**", "**/node_modules/**"]
+    }
+)
