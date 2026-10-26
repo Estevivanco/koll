@@ -1,0 +1,13 @@
+{
+    "name": "@koll/categorizer",
+    "version": "0.0.0",
+    "type": "module",
+    "dependencies": {
+        "@google/genai": "^2.31.0",
+        "@koll/shared": "*",
+        "pg": "^8.23.1"
+    },
+    "devDependencies": {
+        "@types/pg": "^8.23.1"
+    }
+}
