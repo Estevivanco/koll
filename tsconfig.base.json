@@ -8,6 +8,7 @@
         "strict": true,
         "esModuleInterop": true,
         // Don't type-check .d.ts files from node_modules; faster and avoids third-party noise
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "types": ["node"]
     }
 }
