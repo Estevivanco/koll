@@ -96,6 +96,6 @@ flowchart TB
 
 ## Deployment
 
-- **Now:** agents run locally with `tsx`, Postgres in Docker, the model on Google Cloud.
-- **Next:** one container per agent, started together with Docker Compose.
-- **Later:** the same containers on Kubernetes (GKE).
+- **Docker Compose:** one image for every agent. `docker compose up -d` starts Postgres and the agents; the orchestrator runs as a one-off container per request.
+- **Kubernetes (local, kind):** the same image as Deployments with Services, a PersistentVolumeClaim for Postgres, readiness and liveness probes, and configuration from a ConfigMap and Secrets that are created from local files, never stored in git. See [`k8s/README.md`](k8s/README.md).
+- **Later:** the same manifests on Google Kubernetes Engine, once the agents require authentication.
