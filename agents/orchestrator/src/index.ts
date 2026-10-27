@@ -1,35 +1,52 @@
-import { ClientFactory } from "@a2a-js/sdk/client";
 import { createMessage, readData, readText, textPart } from "@koll/a2a";
+import { discoverAgents } from "./agents.js";
+import { createGeminiRouter } from "./gemini.js";
+import { NO_AGENT, type Router } from "./router.js";
 
-// Where each agent lives. Step 7 replaces "you pick the agent" with "the AI picks".
-const AGENTS: Record<string, string> = {
-  categorizer: process.env.CATEGORIZER_URL ?? "http://localhost:4001",
-  analyst: process.env.ANALYST_URL ?? "http://localhost:4002",
-};
+// The ONE place that decides which AI does the routing
+function createRouter(): Router {
+  switch (process.env.AI_PROVIDER) {
+    case "gemini":
+      return createGeminiRouter();
+    default:
+      throw new Error(`Unknown AI_PROVIDER: ${process.env.AI_PROVIDER}`);
+  }
+}
 
-const [agentName, ...words] = process.argv.slice(2);
-const text = words.join(" ");
-const url = AGENTS[agentName];
-
-if (!url || !text) {
-  console.error(`Usage: npx tsx --env-file=.env agents/orchestrator/src/index.ts <${Object.keys(AGENTS).join("|")}> "<message>"`);
+const request = process.argv.slice(2).join(" ");
+if (!request) {
+  console.error('Usage: npx tsx --env-file=.env agents/orchestrator/src/index.ts "Hur mycket la jag på mat i september?"');
   process.exit(1);
 }
 
-// 1. Fetch the agent's card and build a client from it
-const client = await new ClientFactory().createFromUrl(url);
-const card = await client.getAgentCard();
-console.log(`→ ${card.name}: "${text}"\n`);
+// 1. Find out which agents exist and what they can do
+const agents = await discoverAgents();
+if (agents.length === 0) {
+  console.error("No agents are running. Start them first.");
+  process.exit(1);
+}
+console.log(`Agents found: ${agents.map((a) => a.name).join(", ")}`);
 
-// 2. Send the message
-const result = await client.sendMessage({
+// 2. Let the AI pick the agent
+const route = await createRouter().route(request, agents);
+const agent = agents.find((a) => a.name === route.agent);
+
+if (route.agent === NO_AGENT || !agent) {
+  console.log(`\nNo agent can handle that. ${route.reason}`);
+  process.exit(0);
+}
+console.log(`→ ${agent.name}: "${route.message}"`);
+console.log(`  Why: ${route.reason}\n`);
+
+// 3. Send the message to the chosen agent
+const result = await agent.client.sendMessage({
   tenant: "",
-  message: createMessage("user", [textPart(text)]),
+  message: createMessage("user", [textPart(route.message)]),
   configuration: undefined,
   metadata: {},
 });
 
-// 3. Print the answer. Agents can reply with a Message or a Task; ours send a Message.
+// 4. Print the answer. Agents can reply with a Message or a Task; ours send a Message.
 if (!("messageId" in result)) {
   throw new Error(`Expected a message, got a task with state ${result.status?.state}`);
 }
