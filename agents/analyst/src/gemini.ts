@@ -25,6 +25,9 @@ export function createGeminiModel(): AnalystModel {
           `- Matcha motparter med ILIKE, t.ex. counterparty ILIKE '%spotify%'.\n` +
           `- "Mat" i en fråga betyder både 'Mat' och 'Restaurang': använd category IN ('Mat', 'Restaurang'). ` +
           `Bara om frågan uttryckligen gäller restaurang, café eller att äta ute används 'Restaurang' ensam.\n` +
+          `- Frågor om butiker, ställen eller var man handlar gäller bara vanliga köp. Utesluta alltid de stora ` +
+          `posterna: category NOT IN ('Överföring', 'Boende', 'Lön', 'Studiemedel') (och category kan vara NULL, ` +
+          `så skriv category IS NULL OR category NOT IN (...)).\n` +
           `- Dagens datum är ${today}. "I september" betyder senaste september.\n\n` +
           `Fråga: ${question}`,
         config: {

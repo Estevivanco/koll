@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { CATEGORIES, type Category } from "@koll/shared/src/categories.js";
+import { CATEGORIES, type Category } from "@koll/shared";
 import type { CategorizerProvider } from "./provider.js";
 
 export function createGeminiProvider(): CategorizerProvider {

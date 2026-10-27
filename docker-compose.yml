@@ -8,6 +8,8 @@ services:
     # Named volume: the data survives `docker compose down`; `down -v` wipes it
     volumes:
     - pgdata:/var/lib/postgresql/data
+    # Scripts here run once, when the data volume is first created
+    - ./db/init:/docker-entrypoint-initdb.d:ro
 
 volumes:
   pgdata:

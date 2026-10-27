@@ -1,10 +1,12 @@
 import pg from "pg";
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL is not set. Run with: npx tsx --env-file=.env ...");
+if (!process.env.ANALYST_DATABASE_URL) {
+  throw new Error("ANALYST_DATABASE_URL is not set. Run with: npx tsx --env-file=.env ...");
 }
 
-export const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+// Deliberately NOT the main DATABASE_URL: this login can only read (see db/init/01-analyst-role.sh),
+// so even if every check below failed, Postgres would still refuse to change or leak anything else.
+export const pool = new pg.Pool({ connectionString: process.env.ANALYST_DATABASE_URL });
 
 const MAX_ROWS = 200;
 

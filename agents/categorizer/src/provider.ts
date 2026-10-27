@@ -1,5 +1,5 @@
 import type { Transaction } from "@koll/shared";
-import type { Category } from "@koll/shared/src/categories.js";
+import type { Category } from "@koll/shared";
 
 export type CategoryResult = { id: string; category: Category };
 
