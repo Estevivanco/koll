@@ -34,6 +34,9 @@ spec:
             - configMapRef:
                 name: koll-config
           env:
+            # Can only touch the daily Gemini call counter. $(NAME) comes from the Secret above.
+            - name: BUDGET_DATABASE_URL
+              value: postgres://budget_rw:$(BUDGET_DB_PASSWORD)@db:5432/$(POSTGRES_DB)
             # The address written in the agent card
             - name: PUBLIC_HOST
               value: analyst

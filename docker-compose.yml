@@ -9,6 +9,8 @@ x-agent: &agent
     # Inside Docker the database is reached by its service name "db", not localhost
     DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
     ANALYST_DATABASE_URL: postgres://analyst_ro:${ANALYST_DB_PASSWORD}@db:5432/${POSTGRES_DB}
+    # Can only touch the daily Gemini call counter
+    BUDGET_DATABASE_URL: postgres://budget_rw:${BUDGET_DB_PASSWORD}@db:5432/${POSTGRES_DB}
     # Your Google login from `gcloud auth application-default login`, mounted read-only below
     GOOGLE_APPLICATION_CREDENTIALS: /gcloud/adc.json
   volumes:
@@ -23,8 +25,9 @@ services:
     image: postgres:17
     # Postgres reads POSTGRES_USER / POSTGRES_PASSWORD / POSTGRES_DB from .env (gitignored)
     env_file: .env
+    # 127.0.0.1 = only this computer. Without it, Docker publishes the port to your whole network.
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       # Named volume: the data survives `docker compose down`; `down -v` wipes it
       - pgdata:/var/lib/postgresql/data
@@ -45,7 +48,7 @@ services:
       # The address written in the agent card, so other containers can reach it
       PUBLIC_HOST: categorizer
     ports:
-      - "4001:4001"
+      - "127.0.0.1:4001:4001"
 
   analyst:
     <<: *agent
@@ -54,7 +57,7 @@ services:
       <<: *agent-env
       PUBLIC_HOST: analyst
     ports:
-      - "4002:4002"
+      - "127.0.0.1:4002:4002"
 
   # Not started by `up`. Run it when you have a question:
   #   docker compose run --rm orchestrator "Hur mycket la jag på mat i september?"

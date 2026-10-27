@@ -8,6 +8,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY packages/shared/package.json packages/shared/
 COPY packages/a2a/package.json packages/a2a/
+COPY packages/budget/package.json packages/budget/
 COPY packages/importer/package.json packages/importer/
 COPY packages/mcp-server/package.json packages/mcp-server/
 COPY agents/categorizer/package.json agents/categorizer/

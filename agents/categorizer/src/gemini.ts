@@ -1,4 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
+import { reserveGeminiCall } from "@koll/budget";
 import { CATEGORIES, type Category } from "@koll/shared";
 import type { CategorizerProvider } from "./provider.js";
 
@@ -10,13 +11,17 @@ export function createGeminiProvider(): CategorizerProvider {
     throw new Error("Missing GOOGLE_CLOUD_PROJECT, VERTEX_REGION or GEMINI_MODEL in .env");
   }
 
-  const ai = new GoogleGenAI({ vertexai: true, project, location });
+  // The SDK retries failed calls up to 5 times by default. When Gemini is rate-limiting (429),
+  // that makes things worse and slower, so allow just one retry (attempts includes the first call).
+  const ai = new GoogleGenAI({ vertexai: true, project, location, httpOptions: { retryOptions: { attempts: 2 } } });
 
   return {
     async categorize(transactions) {
       const lines = transactions
         .map((t) => `${t.id} | ${t.amount} kr | ${t.counterparty} | ${t.description}`)
         .join("\n");
+
+      await reserveGeminiCall();
 
       const response = await ai.models.generateContent({
         model,

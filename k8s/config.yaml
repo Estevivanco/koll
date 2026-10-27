@@ -10,3 +10,5 @@ data:
   VERTEX_REGION: global
   # Where the orchestrator looks for agents: the Service names below
   AGENT_URLS: http://categorizer:4001,http://analyst:4002
+  # Max Gemini calls per day across all agents
+  GEMINI_DAILY_LIMIT: "100"

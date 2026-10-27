@@ -1,0 +1,12 @@
+{
+    "name": "@koll/budget",
+    "version": "0.0.0",
+    "type": "module",
+    "main": "src/index.ts",
+    "dependencies": {
+        "pg": "^8.23.1"
+    },
+    "devDependencies": {
+        "@types/pg": "^8.23.1"
+    }
+}

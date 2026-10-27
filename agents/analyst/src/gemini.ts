@@ -1,4 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
+import { reserveGeminiCall } from "@koll/budget";
 import type { AnalystModel } from "./model.js";
 import { SCHEMA } from "./schema.js";
 
@@ -10,11 +11,14 @@ export function createGeminiModel(): AnalystModel {
     throw new Error("Missing GOOGLE_CLOUD_PROJECT, VERTEX_REGION or GEMINI_MODEL in .env");
   }
 
-  const ai = new GoogleGenAI({ vertexai: true, project, location });
+  // The SDK retries failed calls up to 5 times by default. When Gemini is rate-limiting (429),
+  // that makes things worse and slower, so allow just one retry (attempts includes the first call).
+  const ai = new GoogleGenAI({ vertexai: true, project, location, httpOptions: { retryOptions: { attempts: 2 } } });
 
   return {
     async writeSql(question) {
       const today = new Date().toISOString().slice(0, 10);
+      await reserveGeminiCall();
       const response = await ai.models.generateContent({
         model,
         contents:
@@ -45,6 +49,7 @@ export function createGeminiModel(): AnalystModel {
     },
 
     async explain(question, sql, rows) {
+      await reserveGeminiCall();
       const response = await ai.models.generateContent({
         model,
         contents:
