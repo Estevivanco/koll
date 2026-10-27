@@ -1,0 +1,14 @@
+{
+  "name": "@koll/mcp-server",
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "@koll/shared": "*",
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "pg": "^8.23.1",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.23.1"
+  }
+}

@@ -16,6 +16,6 @@
     },
     "scripts": {
         "lint": "eslint .",
-        "typecheck": "tsc -p packages/shared --noEmit && tsc -p packages/importer --noEmit && tsc -p packages/a2a --noEmit && tsc -p agents/categorizer --noEmit && tsc -p agents/analyst --noEmit && tsc -p agents/orchestrator --noEmit"
+        "typecheck": "tsc -p packages/shared --noEmit && tsc -p packages/importer --noEmit && tsc -p packages/a2a --noEmit && tsc -p agents/categorizer --noEmit && tsc -p agents/analyst --noEmit && tsc -p agents/orchestrator --noEmit  && tsc -p packages/mcp-server --noEmit"
     }
 }
