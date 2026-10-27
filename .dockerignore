@@ -1,0 +1,8 @@
+# Never copy these into the image
+node_modules
+**/node_modules
+.env
+data
+.git
+dist
+explanations.md

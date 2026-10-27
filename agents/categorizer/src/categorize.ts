@@ -13,6 +13,8 @@ function createProvider(): CategorizerProvider {
   }
 }
 
+const MAX_BATCH = 200;
+
 export type CategorizeSummary = {
   total: number;
   fromRules: number;
@@ -22,7 +24,8 @@ export type CategorizeSummary = {
 
 // The categorizer's actual job. Used by both the terminal script and the A2A server.
 export async function categorizeBatch(limit: number): Promise<CategorizeSummary> {
-  const transactions = await getUncategorized(limit);
+  // "Kategorisera 100000" must not become one giant prompt (cost and Gemini's size limit)
+  const transactions = await getUncategorized(Math.min(limit, MAX_BATCH));
   if (transactions.length === 0) {
     return { total: 0, fromRules: 0, fromAi: 0, rows: [] };
   }

@@ -1,15 +1,74 @@
+# Values like ${POSTGRES_USER} are read from .env automatically.
+
+# Settings every agent container shares
+x-agent: &agent
+  build: .
+  image: koll-agent
+  env_file: .env
+  environment: &agent-env
+    # Inside Docker the database is reached by its service name "db", not localhost
+    DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    ANALYST_DATABASE_URL: postgres://analyst_ro:${ANALYST_DB_PASSWORD}@db:5432/${POSTGRES_DB}
+    # Your Google login from `gcloud auth application-default login`, mounted read-only below
+    GOOGLE_APPLICATION_CREDENTIALS: /gcloud/adc.json
+  volumes:
+    - ${HOME}/.config/gcloud/application_default_credentials.json:/gcloud/adc.json:ro
+  depends_on:
+    db:
+      condition: service_healthy
+  restart: unless-stopped
+
 services:
   db:
     image: postgres:17
     # Postgres reads POSTGRES_USER / POSTGRES_PASSWORD / POSTGRES_DB from .env (gitignored)
     env_file: .env
     ports:
-    - "5432:5432"
-    # Named volume: the data survives `docker compose down`; `down -v` wipes it
+      - "5432:5432"
     volumes:
-    - pgdata:/var/lib/postgresql/data
-    # Scripts here run once, when the data volume is first created
-    - ./db/init:/docker-entrypoint-initdb.d:ro
+      # Named volume: the data survives `docker compose down`; `down -v` wipes it
+      - pgdata:/var/lib/postgresql/data
+      # Scripts here run once, when the data volume is first created
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    # Agents wait until Postgres actually accepts connections, not just until it has started
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  categorizer:
+    <<: *agent
+    command: ["npx", "tsx", "agents/categorizer/src/server.ts"]
+    environment:
+      <<: *agent-env
+      # The address written in the agent card, so other containers can reach it
+      PUBLIC_HOST: categorizer
+    ports:
+      - "4001:4001"
+
+  analyst:
+    <<: *agent
+    command: ["npx", "tsx", "agents/analyst/src/server.ts"]
+    environment:
+      <<: *agent-env
+      PUBLIC_HOST: analyst
+    ports:
+      - "4002:4002"
+
+  # Not started by `up`. Run it when you have a question:
+  #   docker compose run --rm orchestrator "Hur mycket la jag på mat i september?"
+  orchestrator:
+    <<: *agent
+    profiles: ["tools"]
+    restart: "no"
+    entrypoint: ["npx", "tsx", "agents/orchestrator/src/index.ts"]
+    environment:
+      <<: *agent-env
+      AGENT_URLS: http://categorizer:4001,http://analyst:4002
+    depends_on:
+      - categorizer
+      - analyst
 
 volumes:
   pgdata:
