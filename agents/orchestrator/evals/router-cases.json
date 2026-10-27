@@ -1,0 +1,26 @@
+[
+  { "request": "Hur mycket la jag på mat i september?", "expected": "Koll Analyst" },
+  { "request": "Kategorisera 20 transaktioner", "expected": "Koll Categorizer" },
+  { "request": "Vilka tre butiker handlar jag mest hos?", "expected": "Koll Analyst" },
+  { "request": "Sortera in mina nya köp i rätt kategorier", "expected": "Koll Categorizer" },
+  { "request": "Hur mycket har jag betalat till Spotify i år?", "expected": "Koll Analyst" },
+  { "request": "Skriv en dikt om pengar", "expected": "none" },
+  { "request": "Lägg till en regel så att ICA alltid blir Mat", "expected": "none" },
+
+  { "request": "Hur mycket spenderade jag totalt i oktober?", "expected": "Koll Analyst" },
+  { "request": "Vad var min dyraste enskilda utgift i augusti?", "expected": "Koll Analyst" },
+  { "request": "Lade jag mer på mat i september än i augusti?", "expected": "Koll Analyst" },
+  { "request": "Hur mycket i lön fick jag de senaste tre månaderna?", "expected": "Koll Analyst" },
+  { "request": "Hur många gånger har jag handlat på Circle K?", "expected": "Koll Analyst" },
+
+  { "request": "Kategorisera mina senaste 50 köp", "expected": "Koll Categorizer" },
+  { "request": "Fixa kategorierna på mina nya transaktioner", "expected": "Koll Categorizer" },
+  { "request": "Kan du sortera de transaktioner som saknar kategori?", "expected": "Koll Categorizer" },
+
+  { "request": "Ta bort transaktionen från Circle K i går", "expected": "none" },
+  { "request": "Importera min nya CSV-fil från Swedbank", "expected": "none" },
+
+  { "request": "Varför hamnade Spotify i Prenumeration?", "expected": "none" },
+  { "request": "Kategorisera och säg sen vad jag lagt mest på", "expected": "Koll Categorizer" },
+  { "request": "Hur många transaktioner saknar kategori just nu?", "expected": "Koll Analyst" }
+]
