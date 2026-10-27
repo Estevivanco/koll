@@ -1,0 +1,44 @@
+# The orchestrator isn't a server; it runs once per question. This pod just waits,
+# and you run the orchestrator inside it with:
+#   kubectl exec -n koll deploy/orchestrator -- npx tsx agents/orchestrator/src/index.ts "Din fråga"
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orchestrator
+  namespace: koll
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orchestrator
+  template:
+    metadata:
+      labels:
+        app: orchestrator
+    spec:
+      # Kubernetes would otherwise inject env vars like CATEGORIZER_PORT=tcp://10.x.x.x:4001 for every
+      # Service, which collides with our own CATEGORIZER_PORT. We use DNS names (http://categorizer:4001).
+      enableServiceLinks: false
+      containers:
+        - name: orchestrator
+          image: koll-agent:latest
+          imagePullPolicy: Never
+          command: ["sleep", "infinity"]
+          # From your .env (Secret) and config.yaml (ConfigMap). If both have the same
+          # name, the ConfigMap wins because it comes last, and env: below wins over both.
+          envFrom:
+            - secretRef:
+                name: koll-secrets
+            - configMapRef:
+                name: koll-config
+          env:
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /gcloud/adc.json
+          volumeMounts:
+            - name: gcloud
+              mountPath: /gcloud
+              readOnly: true
+      volumes:
+        - name: gcloud
+          secret:
+            secretName: gcloud-adc

@@ -1,0 +1,12 @@
+# Settings that are NOT secret. Passwords and the Google login live in Secrets
+# created with kubectl (see k8s/README.md), so they never end up in git.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: koll-config
+  namespace: koll
+data:
+  AI_PROVIDER: gemini
+  VERTEX_REGION: global
+  # Where the orchestrator looks for agents: the Service names below
+  AGENT_URLS: http://categorizer:4001,http://analyst:4002

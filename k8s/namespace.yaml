@@ -1,0 +1,5 @@
+# A namespace is a folder inside the cluster. Everything Koll lives in "koll".
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: koll

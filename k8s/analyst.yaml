@@ -1,0 +1,82 @@
+# The analyst agent: a Deployment that keeps it running, and a Service named "analyst".
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analyst
+  namespace: koll
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: analyst
+  template:
+    metadata:
+      labels:
+        app: analyst
+    spec:
+      # Kubernetes would otherwise inject env vars like CATEGORIZER_PORT=tcp://10.x.x.x:4001 for every
+      # Service, which collides with our own CATEGORIZER_PORT. We use DNS names (http://categorizer:4001).
+      enableServiceLinks: false
+      containers:
+        - name: analyst
+          # The image you built with Docker Compose, loaded into kind with "kind load"
+          image: koll-agent:latest
+          # Never download it: it only exists on your machine
+          imagePullPolicy: Never
+          command: ["npx", "tsx", "agents/analyst/src/server.ts"]
+          ports:
+            - containerPort: 4002
+          # From your .env (Secret) and config.yaml (ConfigMap). If both have the same
+          # name, the ConfigMap wins because it comes last, and env: below wins over both.
+          envFrom:
+            - secretRef:
+                name: koll-secrets
+            - configMapRef:
+                name: koll-config
+          env:
+            # The address written in the agent card
+            - name: PUBLIC_HOST
+              value: analyst
+            # $(NAME) is filled in by Kubernetes from the Secret above.
+            # Inside the cluster the database is "db", not localhost.
+            - name: DATABASE_URL
+              value: postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@db:5432/$(POSTGRES_DB)
+            - name: ANALYST_DATABASE_URL
+              value: postgres://analyst_ro:$(ANALYST_DB_PASSWORD)@db:5432/$(POSTGRES_DB)
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /gcloud/adc.json
+          volumeMounts:
+            - name: gcloud
+              mountPath: /gcloud
+              readOnly: true
+          # Ready = the agent card answers. Until then, no traffic is sent here.
+          readinessProbe:
+            httpGet:
+              path: /.well-known/agent-card.json
+              port: 4002
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          # Alive = the agent card still answers. If not, Kubernetes restarts the container.
+          livenessProbe:
+            httpGet:
+              path: /.well-known/agent-card.json
+              port: 4002
+            initialDelaySeconds: 15
+            periodSeconds: 20
+      volumes:
+        # Your Google login, from a Secret, so the agent can call Gemini
+        - name: gcloud
+          secret:
+            secretName: gcloud-adc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: analyst
+  namespace: koll
+spec:
+  selector:
+    app: analyst
+  ports:
+    - port: 4002
+      targetPort: 4002

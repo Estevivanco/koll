@@ -1,0 +1,82 @@
+# Postgres: a disk that survives restarts, one pod running Postgres, and a stable address "db".
+
+# 1. The disk. kind gives it a folder on its own node; GKE would give it a real cloud disk.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pgdata
+  namespace: koll
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 1Gi
+---
+# 2. The pod running Postgres. A Deployment keeps it running and restarts it if it dies.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db
+  namespace: koll
+spec:
+  replicas: 1
+  # Stop the old pod before starting a new one: two Postgres can't share one disk
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      # Kubernetes would otherwise inject env vars like CATEGORIZER_PORT=tcp://10.x.x.x:4001 for every
+      # Service, which collides with our own CATEGORIZER_PORT. We use DNS names (http://categorizer:4001).
+      enableServiceLinks: false
+      containers:
+        - name: postgres
+          image: postgres:17
+          ports:
+            - containerPort: 5432
+          # POSTGRES_USER / POSTGRES_PASSWORD / POSTGRES_DB / ANALYST_DB_PASSWORD from your .env
+          envFrom:
+            - secretRef:
+                name: koll-secrets
+          env:
+            # A subfolder, because a fresh disk may already contain a "lost+found" folder
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+            - name: init
+              mountPath: /docker-entrypoint-initdb.d
+              readOnly: true
+          # Kubernetes only sends traffic here once Postgres accepts connections
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""]
+            periodSeconds: 5
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: pgdata
+        # The same db/init scripts as in Docker Compose (creates the analyst_ro login)
+        - name: init
+          configMap:
+            name: db-init
+            defaultMode: 0755
+---
+# 3. The stable address. Other pods reach Postgres at "db:5432", whichever pod is running.
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  namespace: koll
+spec:
+  selector:
+    app: db
+  ports:
+    - port: 5432
+      targetPort: 5432
