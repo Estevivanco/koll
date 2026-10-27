@@ -25,25 +25,25 @@ flowchart TB
     csv["Bank CSV export"]
     evals["Evals<br/>accuracy tests"]
 
-    claude -. MCP .-> mcp
+    claude -- MCP --> mcp
     ui -.-> orch
-    mcp -. tools .-> db
+    mcp -- read-only tools --> db
     orch -- A2A --> cat
-    orch -. A2A .-> ana
+    orch -- A2A --> ana
     orch -. A2A .-> sub
-    orch -. picks agent .-> gemini
+    orch -- picks agent --> gemini
     cat --> gemini
-    ana -.-> gemini
+    ana --> gemini
     cat <-- read + save --> db
-    ana -. read-only SQL .-> db
+    ana -- read-only SQL --> db
     sub -.-> db
     csv --> imp --> db
     evals -. measures .-> agents
 
     classDef built stroke-width:2px
     classDef planned stroke-dasharray:5 5
-    class orch,gemini,cat,db,imp,csv built
-    class claude,ui,mcp,ana,sub,evals planned
+    class orch,gemini,cat,ana,mcp,claude,db,imp,csv built
+    class ui,sub,evals planned
 ```
 
 ## Components
@@ -51,14 +51,14 @@ flowchart TB
 | Component | Status | What it does | Code |
 |---|---|---|---|
 | Importer | Built | Converts bank CSV rows into a shared `Transaction` format and stores them. Re-importing a file creates no duplicates. | `packages/importer/` |
-| Postgres | Built | Stores transactions and categories. Runs in Docker. | `docker-compose.yml` |
-| Shared types | Built | The `Transaction` type every component uses. | `packages/shared/` |
+| Postgres | Built | Stores transactions and categories. Runs in Docker. Has a separate read-only login used by the analyst and the MCP server. | `docker-compose.yml`, `db/init/` |
+| Shared types | Built | The `Transaction` type and category list every component uses. | `packages/shared/` |
+| A2A helpers | Built | Builds messages and agent cards and starts agent servers, so each agent only contains its own logic. | `packages/a2a/` |
 | Categorizer agent | Built | Applies user-defined rules first, sends the rest to the model, and saves the categories. Runs as its own A2A server. | `agents/categorizer/` |
-| Orchestrator | Built (basic) | Discovers agents through their agent cards and sends them tasks over A2A. | `agents/orchestrator/` |
-| Model provider | Built | Gemini via Vertex AI, behind a provider interface so the model can be swapped. | `agents/categorizer/src/provider.ts` |
-| Analyst agent | Planned | Turns a question in plain Swedish into SQL, runs it with read-only access, and explains the result. | |
-| Orchestrator routing | Planned | Uses the model to read the agent cards and choose which agent handles a request. | |
-| MCP server | Planned | Exposes bank-data tools to MCP clients such as Claude Desktop. | |
+| Orchestrator | Built | Discovers agents through their agent cards, lets the model choose which agent should handle a request (and explain why), then sends it over A2A. | `agents/orchestrator/` |
+| Model provider | Built | Gemini via Vertex AI, behind an interface in each agent so the model can be swapped. | `provider.ts` / `model.ts` / `router.ts` |
+| Analyst agent | Built | Turns a question in plain Swedish into SQL, runs it with read-only access, and explains the result. Returns the SQL so every answer can be checked. | `agents/analyst/` |
+| MCP server | Built | Four read-only tools for MCP clients such as Claude Desktop: spending by category, transaction search, monthly totals and recurring payments. Fixed, parameterized SQL. | `packages/mcp-server/` |
 | Subscription hunter | Planned | Finds recurring charges and price changes. | |
 | Evals | Planned | An answer key and accuracy measurement for the categorizer and analyst. | |
 | React UI | Planned | Chat interface with a live view of agents working. | |
@@ -75,7 +75,13 @@ flowchart TB
 5. The remaining transactions go to the model, which must answer in a fixed JSON schema.
 6. Categories are saved, and the agent replies with a text summary and structured data.
 
-**Ask a question (planned):** UI → orchestrator picks the analyst → analyst has the model write SQL → runs it read-only → model explains the numbers → answer returns to the UI.
+**Ask a question (working):**
+1. The orchestrator fetches every agent card and gives the model the list of agents and their skills.
+2. The model picks the analyst and explains why. It can only answer with agents that exist, or "none".
+3. The analyst has the model write one SQL query and runs it with five safety layers: SELECT only, one statement, a read-only transaction, time and row limits, and a database login that cannot write.
+4. The model explains the numbers, and the reply includes the SQL and the rows.
+
+**Claude via MCP (working):** Claude Desktop starts the MCP server, picks a tool such as `recurring_payments`, and the server runs that tool's fixed SQL with the read-only login. No model writes SQL on this path.
 
 ## Design decisions
 
@@ -84,6 +90,9 @@ flowchart TB
 - **Rules before AI.** Deterministic user rules handle known merchants. The model only sees what the rules can't decide, which also lowers cost.
 - **Never trust model output blindly.** Responses are forced into a JSON schema, and any category outside the allowed list falls back to "Övrigt".
 - **Agents only know each other's address and agent card.** That keeps them independent and deployable as separate containers.
+- **Routing by agent card, not by code.** The orchestrator has no hardcoded rules for which agent does what. A new agent with a clear agent card can be used without changing the orchestrator.
+- **Defense in depth for AI-written SQL.** Code checks can have bugs, so the last layer is the database itself: the analyst connects with a login that has SELECT rights only.
+- **Fixed SQL where possible.** The MCP tools use fixed, parameterized queries. Model-written SQL is only used where questions are too open for fixed tools.
 
 ## Deployment
 
