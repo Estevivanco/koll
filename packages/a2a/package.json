@@ -1,0 +1,13 @@
+{
+    "name": "@koll/a2a",
+    "version": "0.0.0",
+    "type": "module",
+    "main": "src/index.ts",
+    "dependencies": {
+        "@a2a-js/sdk": "^1.3.0",
+        "express": "^5.3.0"
+    },
+    "devDependencies": {
+        "@types/express": "^5.0.6"
+    }
+}

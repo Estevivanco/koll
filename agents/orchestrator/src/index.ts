@@ -1,43 +1,41 @@
-import { Role, type Message } from "@a2a-js/sdk";
 import { ClientFactory } from "@a2a-js/sdk/client";
+import { createMessage, readData, readText, textPart } from "@koll/a2a";
 
-const categorizerUrl = process.env.CATEGORIZER_URL ?? "http://localhost:4001";
-const limit = process.argv[2] ?? "10";
-
-// 1. Fetch the categorizer's agent card and build a client from it
-const client = await new ClientFactory().createFromUrl(categorizerUrl);
-const card = await client.getAgentCard();
-console.log(`Found agent: ${card.name}. Skills: ${card.skills.map((s) => s.name).join(", ")}`);
-
-// 2. Send it a message
-const message: Message = {
-  messageId: crypto.randomUUID(),
-  contextId: "",
-  taskId: "",
-  role: Role.ROLE_USER,
-  parts: [
-    {
-      content: { $case: "text", value: `Kategorisera ${limit} transaktioner` },
-      metadata: undefined,
-      filename: "",
-      mediaType: "text/plain",
-    },
-  ],
-  metadata: {},
-  extensions: [],
-  referenceTaskIds: [],
+// Where each agent lives. Step 7 replaces "you pick the agent" with "the AI picks".
+const AGENTS: Record<string, string> = {
+  categorizer: process.env.CATEGORIZER_URL ?? "http://localhost:4001",
+  analyst: process.env.ANALYST_URL ?? "http://localhost:4002",
 };
 
-const result = await client.sendMessage({ tenant: "", message, configuration: undefined, metadata: {} });
+const [agentName, ...words] = process.argv.slice(2);
+const text = words.join(" ");
+const url = AGENTS[agentName];
 
-// 3. Read the answer. An agent can reply with a Message or a Task; ours sends a Message.
+if (!url || !text) {
+  console.error(`Usage: npx tsx --env-file=.env agents/orchestrator/src/index.ts <${Object.keys(AGENTS).join("|")}> "<message>"`);
+  process.exit(1);
+}
+
+// 1. Fetch the agent's card and build a client from it
+const client = await new ClientFactory().createFromUrl(url);
+const card = await client.getAgentCard();
+console.log(`→ ${card.name}: "${text}"\n`);
+
+// 2. Send the message
+const result = await client.sendMessage({
+  tenant: "",
+  message: createMessage("user", [textPart(text)]),
+  configuration: undefined,
+  metadata: {},
+});
+
+// 3. Print the answer. Agents can reply with a Message or a Task; ours send a Message.
 if (!("messageId" in result)) {
   throw new Error(`Expected a message, got a task with state ${result.status?.state}`);
 }
 
-for (const part of result.parts) {
-  if (part.content?.$case === "text") console.log(part.content.value);
-  if (part.content?.$case === "data" && part.content.value.rows.length > 0) {
-    console.table(part.content.value.rows);
-  }
-}
+console.log(readText(result));
+
+const data = readData(result) as { sql?: string; rows?: unknown[] } | undefined;
+if (data?.sql) console.log(`\nSQL:\n${data.sql}`);
+if (data?.rows?.length) console.table(data.rows);

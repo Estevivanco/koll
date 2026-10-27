@@ -1,5 +1,5 @@
 import type { Transaction } from "@koll/shared";
-import type { Category } from "./categories.js";
+import type { Category } from "@koll/shared/src/categories.js";
 import type { CategoryResult } from "./provider.js";
 
 // `when` is optional and gets the amount spent in kr (positive number, 0 or less = money in)

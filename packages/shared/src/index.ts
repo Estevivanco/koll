@@ -11,3 +11,5 @@ export type Transaction = {
     // Optional: empty until the categorizer agent fills it in
     category?: string;
 }
+
+export { CATEGORIES, type Category } from "./categories.js";
