@@ -1,4 +1,4 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI, Type, ThinkingLevel } from "@google/genai";
 import { reserveGeminiCall } from "@koll/budget";
 import { CATEGORIES, type Category } from "@koll/shared";
 import type { CategorizerProvider } from "./provider.js";
@@ -37,6 +37,7 @@ export function createGeminiProvider(): CategorizerProvider {
           `Negativt belopp = utgift, positivt = inkomst. Om du är osäker, välj "Övrigt".\n\n` +
           `Transaktioner (id | belopp | motpart | referens):\n${lines}`,
         config: {
+          thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
           // Forces the answer to be JSON in exactly this shape, no free text
           responseMimeType: "application/json",
           responseSchema: {
