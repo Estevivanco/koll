@@ -1,0 +1,51 @@
+/*
+  Design tokens: the only place colors, type and spacing are defined.
+  Everything else refers to these names, so changing the look means editing this file.
+*/
+:root {
+  color-scheme: dark;
+
+  /* The five colors */
+  --ink: #0e1512; /* page background */
+  --paper: #ece8dd; /* text */
+  --green: #199e70; /* primary accent: prompt, buttons, data */
+  --amber: #c98500; /* notices and warnings */
+  --blue: #3987e5; /* agents */
+
+  /* Tints made by mixing the five above (no extra hues, no gradients) */
+  --surface: #161d19; /* cards: ink lifted slightly. Chart colors are validated against this. */
+  --line: color-mix(in srgb, var(--paper) 13%, var(--ink));
+  --line-faint: color-mix(in srgb, var(--paper) 7%, var(--ink));
+  --text: var(--paper);
+  --text-2: color-mix(in srgb, var(--paper) 74%, var(--ink));
+  --text-muted: color-mix(in srgb, var(--paper) 54%, var(--ink));
+  --wash: color-mix(in srgb, var(--paper) 6%, transparent);
+
+  /* Type */
+  --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+
+  /* Spacing (4px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+
+  --radius-sm: 6px;
+  --radius: 12px;
+  --radius-lg: 16px;
+
+  --content-width: 1120px;
+  --header-height: 60px;
+}

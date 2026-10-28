@@ -1,0 +1,35 @@
+.table {
+  margin: var(--space-2) 0;
+  font-size: var(--text-sm);
+}
+
+.table th {
+  padding: 2px var(--space-4) 2px 0;
+  color: var(--text-muted);
+  font-weight: 400;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+
+.table td {
+  padding: 2px var(--space-4) 2px 0;
+}
+
+.number {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.barCell {
+  width: 140px;
+  padding-right: 0 !important;
+}
+
+.bar {
+  display: block;
+  width: calc(var(--ratio) * 100%);
+  min-width: 2px;
+  height: 8px;
+  background: var(--green);
+  border-radius: 0 3px 3px 0;
+}

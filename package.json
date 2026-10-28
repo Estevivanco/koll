@@ -4,12 +4,14 @@
     "type": "module",
     "workspaces": [
         "packages/*",
-        "agents/*"
+        "agents/*",
+        "apps/*"
     ],
     "devDependencies": {
         "@eslint/js": "^10.0.1",
         "@types/node": "^26.6.5",
         "eslint": "^10.13.0",
+        "eslint-plugin-react-hooks": "^7.1.1",
         "tsx": "^4.23.15",
         "typescript": "6.0",
         "typescript-eslint": "^8.72.0"
@@ -17,6 +19,7 @@
     "scripts": {
         "lint": "eslint .",
         "usage": "bash scripts/usage.sh",
-        "typecheck": "tsc -p packages/shared --noEmit && tsc -p packages/importer --noEmit && tsc -p packages/a2a --noEmit && tsc -p packages/budget --noEmit && tsc -p agents/categorizer --noEmit && tsc -p agents/analyst --noEmit && tsc -p agents/orchestrator --noEmit  && tsc -p packages/mcp-server --noEmit"
+        "web": "npm run dev -w @koll/web",
+        "typecheck": "tsc -p packages/shared --noEmit && tsc -p packages/importer --noEmit && tsc -p packages/a2a --noEmit && tsc -p packages/budget --noEmit && tsc -p agents/categorizer --noEmit && tsc -p agents/analyst --noEmit && tsc -p agents/orchestrator --noEmit && tsc -p apps/web --noEmit  && tsc -p packages/mcp-server --noEmit"
     }
 }

@@ -1,0 +1,45 @@
+/* The drawn diagram needs room; on narrow screens the numbered steps below tell the same story */
+@media (max-width: 760px) {
+  .diagram {
+    display: none;
+  }
+}
+
+.steps {
+  display: grid;
+  gap: var(--space-3);
+  margin: var(--space-6) 0 0;
+  padding-left: var(--space-5);
+  max-width: 70ch;
+  color: var(--text-2);
+}
+
+.steps li::marker {
+  color: var(--green);
+  font-family: var(--font-mono);
+}
+
+.safeguards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+}
+
+.safeguard {
+  padding: var(--space-5);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.safeguardTitle {
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+
+.safeguardText {
+  margin-top: var(--space-2);
+  color: var(--text-2);
+  font-size: var(--text-sm);
+}

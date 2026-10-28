@@ -1,0 +1,88 @@
+.list {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 112px 1fr;
+  align-items: center;
+  min-height: 36px;
+  padding-inline: var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.row:hover,
+.row:focus-visible {
+  background: var(--wash);
+}
+
+.label {
+  color: var(--text-2);
+  font-size: var(--text-sm);
+}
+
+.track {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* 84px is left free on the right so the longest bar still has room for its number */
+.bar {
+  flex: none;
+  width: calc((100% - 84px) * var(--ratio));
+  min-width: 2px;
+  height: 14px;
+  background: var(--green);
+  border-radius: 0 4px 4px 0;
+}
+
+.value {
+  flex: none;
+  font-size: var(--text-sm);
+  white-space: nowrap;
+}
+
+.tip {
+  position: absolute;
+  bottom: calc(100% - 4px);
+  left: 120px;
+  z-index: 2;
+  padding: var(--space-2) var(--space-3);
+  background: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text-2);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s;
+}
+
+.tip strong {
+  color: var(--text);
+}
+
+.row:hover .tip,
+.row:focus-visible .tip {
+  opacity: 1;
+}
+
+@media (max-width: 600px) {
+  .row {
+    grid-template-columns: 108px 1fr;
+  }
+
+  .tip {
+    left: 8px;
+    white-space: normal;
+    max-width: calc(100% - 16px);
+  }
+}

@@ -1,0 +1,26 @@
+.footer {
+  margin-top: var(--space-9);
+  padding-block: var(--space-6);
+  border-top: 1px solid var(--line-faint);
+}
+
+.inner {
+  display: grid;
+  gap: var(--space-2);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.stack {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.link {
+  width: fit-content;
+  color: var(--text-2);
+}
+
+.link:hover {
+  color: var(--text);
+}

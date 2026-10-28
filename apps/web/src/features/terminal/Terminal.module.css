@@ -1,0 +1,159 @@
+.window {
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: 1.65;
+}
+
+.titlebar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background: color-mix(in srgb, var(--paper) 4%, var(--surface));
+  border-bottom: 1px solid var(--line);
+}
+
+/* Three plain outlines: no red/yellow/green, so the palette stays at five colors */
+.dots {
+  display: inline-flex;
+  gap: var(--space-2);
+}
+
+.dots span {
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--text-muted);
+  border-radius: 50%;
+}
+
+.title {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+.log {
+  height: 400px;
+  padding: var(--space-4) var(--space-5);
+  overflow-y: auto;
+  cursor: text;
+}
+
+.log > p {
+  margin: 0;
+}
+
+.welcome {
+  color: var(--green);
+}
+
+.hint {
+  color: var(--text-muted);
+}
+
+.examples {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  border-top: 1px solid var(--line-faint);
+}
+
+.examplesLabel {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.chip {
+  padding: var(--space-1) var(--space-3);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--text-2);
+  font: inherit;
+  font-size: var(--text-xs);
+}
+
+.chip:hover:not(:disabled) {
+  border-color: var(--green);
+  color: var(--text);
+}
+
+.chip:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.prompt {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  border-top: 1px solid var(--line);
+}
+
+.promptGlyph {
+  color: var(--green);
+  font-weight: 700;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-1) 0;
+  background: transparent;
+  border: 0;
+  color: var(--text);
+  font: inherit;
+  caret-color: var(--green);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.input:focus-visible {
+  outline: none;
+}
+
+.prompt:focus-within {
+  box-shadow: inset 0 0 0 1px var(--green);
+}
+
+.run {
+  padding: var(--space-1) var(--space-3);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--text-2);
+  font: inherit;
+  font-size: var(--text-xs);
+}
+
+.run:hover:not(:disabled) {
+  border-color: var(--green);
+  color: var(--text);
+}
+
+.run:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+@media (max-width: 600px) {
+  .log {
+    height: 360px;
+    padding: var(--space-4);
+  }
+
+  .examples,
+  .prompt {
+    padding-inline: var(--space-4);
+  }
+}

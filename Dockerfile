@@ -14,6 +14,7 @@ COPY packages/mcp-server/package.json packages/mcp-server/
 COPY agents/categorizer/package.json agents/categorizer/
 COPY agents/analyst/package.json agents/analyst/
 COPY agents/orchestrator/package.json agents/orchestrator/
+COPY apps/web/package.json apps/web/
 RUN npm ci
 
 # 2. Then copy the code

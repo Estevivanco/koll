@@ -1,0 +1,60 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-5);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.subtitle {
+  margin-top: 2px;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.toggle {
+  display: inline-flex;
+  flex: none;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.toggle button {
+  padding: 4px 12px;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+.toggle button:hover {
+  background: var(--wash);
+  color: var(--text);
+}
+
+.toggle button[aria-pressed="true"] {
+  background: var(--line);
+  color: var(--text);
+}
+
+/* The chart stretches to fill the card, so two cards side by side end at the same height */
+.bodyChart {
+  display: grid;
+  flex: 1;
+}

@@ -1,0 +1,137 @@
+.hero {
+  padding-top: var(--space-9);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: var(--space-8);
+  align-items: center;
+}
+
+.eyebrow {
+  margin-bottom: var(--space-4);
+  color: var(--green);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.04em;
+}
+
+.title {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.cursor {
+  display: inline-block;
+  width: 0.38em;
+  height: 0.8em;
+  margin-left: 0.12em;
+  background: var(--green);
+  vertical-align: -0.02em;
+  animation: blink 1.2s steps(1) infinite;
+}
+
+.lead {
+  margin-top: var(--space-5);
+  max-width: 52ch;
+  color: var(--text-2);
+  font-size: var(--text-lg);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.primary,
+.secondary {
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.primary {
+  background: var(--green);
+  color: var(--ink);
+}
+
+.primary:hover {
+  background: color-mix(in srgb, var(--green) 82%, var(--paper));
+}
+
+.secondary {
+  border: 1px solid var(--line);
+  color: var(--text);
+}
+
+.secondary:hover {
+  background: var(--wash);
+}
+
+/* The one big number on the page */
+.figure {
+  padding: var(--space-6);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+}
+
+.figureLabel {
+  color: var(--text-muted);
+}
+
+.figureValue {
+  margin-top: var(--space-1);
+  font-size: clamp(3rem, 5.5vw, 3.75rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.figureDelta {
+  margin-top: var(--space-2);
+  color: var(--text-2);
+  font-size: var(--text-sm);
+}
+
+.spark {
+  margin-top: var(--space-5);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--line-faint);
+}
+
+.figureNote {
+  margin-top: var(--space-4);
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-7);
+  }
+}
+
+@media (max-width: 600px) {
+  .hero {
+    padding-top: var(--space-7);
+  }
+
+  .figure {
+    padding: var(--space-5);
+  }
+}
