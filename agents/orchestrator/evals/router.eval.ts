@@ -40,22 +40,42 @@ function createRouter(): Router {
   }
 }
 
-const cases = JSON.parse(
-  await readFile(new URL("./router-cases.json", import.meta.url), "utf8"),
-) as Case[];
+const cases = JSON.parse(await readFile(new URL("./router-cases.json", import.meta.url), "utf8")) as Case[];
+// Optional: only run cases whose request contains this text, e.g. ONLY="mat"
+const only = process.env.ONLY?.toLowerCase();
+const selected = only ? cases.filter((c) => c.request.toLowerCase().includes(only)) : cases;
 const agents = await loadAgents();
 const router = createRouter();
 
 console.log(`Agents: ${agents.map((a) => a.name).join(", ")}`);
-console.log(`Running ${cases.length} cases…\n`);
+console.log(`Running ${selected.length} cases…\n`);
 
 // One at a time, so the output is readable and we don't hit rate limits
 const results: Result[] = [];
-for (const c of cases) {
-  const route = await router.route(c.request, agents);
-  const result = { ...c, got: route.agent, reason: route.reason, ok: route.agent === c.expected };
+// Cases where Gemini failed (timeout, 504...). They say nothing about routing, so they are not scored
+const errors: { request: string; message: string }[] = [];
+for (const c of selected) {
+  const started = Date.now();
+  let route;
+  try {
+    route = await router.route(c.request, agents);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    errors.push({ request: c.request, message });
+    console.log(
+      `! ${c.request}  (${((Date.now() - started) / 1000).toFixed(1)} s)\n    Gemini error: ${message.slice(0, 120)}`,
+    );
+    continue;
+  }
+  const result = {
+    ...c,
+    got: route.agent,
+    reason: route.reason,
+    ok: route.agent === c.expected,
+  };
   results.push(result);
-  console.log(`${result.ok ? "✓" : "✗"} ${c.request}`);
+  const seconds = ((Date.now() - started) / 1000).toFixed(1);
+  console.log(`${result.ok ? "✓" : "✗"} ${c.request}  (${seconds} s)`);
   if (!result.ok) console.log(`    expected ${c.expected}, got ${route.agent}. Why: ${route.reason}`);
 }
 
@@ -63,6 +83,8 @@ for (const c of cases) {
 const passed = results.filter((r) => r.ok).length;
 const accuracy = passed / results.length;
 console.log(`\nAccuracy: ${passed}/${results.length} (${Math.round(accuracy * 100)}%)`);
+if (errors.length > 0)
+  console.log(`${errors.length} case(s) not scored because Gemini failed. Run again to cover them.`);
 
 // Mix-ups: which expected answer most often became which wrong answer
 const mixups = new Map<string, number>();
@@ -75,7 +97,17 @@ if (mixups.size > 0) {
   for (const [key, count] of [...mixups].sort((a, b) => b[1] - a[1])) console.log(`  ${count}× ${key}`);
 }
 
-if (accuracy < MIN_ACCURACY) {
-  console.error(`\nBelow the ${MIN_ACCURACY * 100}% target.`);
+// Too many Gemini errors means the run can't be trusted, even if every scored case passed
+const MAX_ERROR_SHARE = 0.1;
+const errorShare = errors.length / selected.length;
+
+if (results.length === 0 || accuracy < MIN_ACCURACY || errorShare > MAX_ERROR_SHARE) {
+  if (errorShare > MAX_ERROR_SHARE) {
+    console.error(
+      `\n${errors.length} of ${selected.length} cases failed on Gemini errors (max ${MAX_ERROR_SHARE * 100}%).`,
+    );
+  } else {
+    console.error(`\nBelow the ${MIN_ACCURACY * 100}% target.`);
+  }
   process.exit(1);
 }

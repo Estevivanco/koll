@@ -13,7 +13,13 @@ export function createGeminiModel(): AnalystModel {
 
   // The SDK retries failed calls up to 5 times by default. When Gemini is rate-limiting (429),
   // that makes things worse and slower, so allow just one retry (attempts includes the first call).
-  const ai = new GoogleGenAI({ vertexai: true, project, location, httpOptions: { retryOptions: { attempts: 2 } } });
+  // A request that gets no answer in 20 s fails with an error instead of hanging forever.
+  const ai = new GoogleGenAI({
+    vertexai: true,
+    project,
+    location,
+    httpOptions: { timeout: 20_000, retryOptions: { attempts: 2 } },
+  });
 
   return {
     async writeSql(question) {
