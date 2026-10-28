@@ -15,7 +15,9 @@ function createRouter(): Router {
 
 const request = process.argv.slice(2).join(" ");
 if (!request) {
-  console.error('Usage: npx tsx --env-file=.env agents/orchestrator/src/index.ts "Hur mycket la jag på mat i september?"');
+  console.error(
+    'Usage: npx tsx --env-file=.env agents/orchestrator/src/index.ts "Hur mycket la jag på mat i september?"',
+  );
   process.exit(1);
 }
 

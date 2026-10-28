@@ -34,9 +34,12 @@ export async function reserveGeminiCall(): Promise<void> {
     );
     used = rows[0]?.calls;
   } catch (error) {
-    throw new Error(`Could not check the daily Gemini limit, so no call was made: ${(error as Error).message}`, {
-      cause: error,
-    });
+    throw new Error(
+      `Could not check the daily Gemini limit, so no call was made: ${(error as Error).message}`,
+      {
+        cause: error,
+      },
+    );
   }
 
   if (used === undefined) {

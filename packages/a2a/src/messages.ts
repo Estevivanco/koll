@@ -4,11 +4,21 @@ import { Role, type Message, type Part } from "@a2a-js/sdk";
 // so agents only write what matters: the text and the data.
 
 export function textPart(text: string): Part {
-  return { content: { $case: "text", value: text }, metadata: undefined, filename: "", mediaType: "text/plain" };
+  return {
+    content: { $case: "text", value: text },
+    metadata: undefined,
+    filename: "",
+    mediaType: "text/plain",
+  };
 }
 
 export function dataPart(data: unknown): Part {
-  return { content: { $case: "data", value: data }, metadata: undefined, filename: "", mediaType: "application/json" };
+  return {
+    content: { $case: "data", value: data },
+    metadata: undefined,
+    filename: "",
+    mediaType: "application/json",
+  };
 }
 
 export function createMessage(role: "user" | "agent", parts: Part[], contextId = ""): Message {

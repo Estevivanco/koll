@@ -22,7 +22,9 @@ const transactions = parseSwedbank(text);
 try {
   await ensureSchema();
   const inserted = await saveTransactions(transactions);
-  console.log(`${transactions.length} read, ${inserted} new, ${transactions.length - inserted} already there`);
+  console.log(
+    `${transactions.length} read, ${inserted} new, ${transactions.length - inserted} already there`,
+  );
 } finally {
   // Runs even if something above threw, so the connection never stays open
   await pool.end();

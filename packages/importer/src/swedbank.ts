@@ -5,9 +5,18 @@ import type { Transaction } from "@koll/shared";
 // Swedbank's column order. We name columns by position instead of by the header
 // text, because the export mangles å/ä/ö in it ("Bokf�rt saldo").
 const COLUMNS = [
-  "row", "clearing", "account", "product", "currency",
-  "bookingDate", "transactionDate", "valueDate",
-  "reference", "description", "amount", "balance",
+  "row",
+  "clearing",
+  "account",
+  "product",
+  "currency",
+  "bookingDate",
+  "transactionDate",
+  "valueDate",
+  "reference",
+  "description",
+  "amount",
+  "balance",
 ] as const;
 
 type SwedbankRow = Record<(typeof COLUMNS)[number], string>;

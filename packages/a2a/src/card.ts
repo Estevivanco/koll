@@ -26,7 +26,12 @@ export function createAgentCard(input: CardInput): AgentCard {
     description: input.description,
     version: "0.1.0",
     supportedInterfaces: [
-      { url: `http://${PUBLIC_HOST}:${input.port}/`, protocolBinding: "JSONRPC", protocolVersion: A2A_PROTOCOL_VERSION, tenant: "" },
+      {
+        url: `http://${PUBLIC_HOST}:${input.port}/`,
+        protocolBinding: "JSONRPC",
+        protocolVersion: A2A_PROTOCOL_VERSION,
+        tenant: "",
+      },
     ],
     provider: { organization: "Koll", url: "https://github.com/Estevivanco/koll" },
     capabilities: { streaming: false, pushNotifications: false, extensions: [], extendedAgentCard: false },
