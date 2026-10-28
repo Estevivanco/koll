@@ -5,19 +5,20 @@ import { describeAgents, NO_AGENT, type Route, type Router } from "./router.js";
 export function createGeminiRouter(): Router {
   const project = process.env.GOOGLE_CLOUD_PROJECT;
   const location = process.env.VERTEX_REGION;
-  const model = process.env.GEMINI_MODEL;
+  // The router's job is simple, so it can use a smaller, faster model than the analyst
+  const model = process.env.ROUTER_MODEL ?? process.env.GEMINI_MODEL;
   if (!project || !location || !model) {
     throw new Error("Missing GOOGLE_CLOUD_PROJECT, VERTEX_REGION or GEMINI_MODEL in .env");
   }
 
   // The SDK retries failed calls up to 5 times by default. When Gemini is rate-limiting (429),
   // that makes things worse and slower, so allow just one retry (attempts includes the first call).
-  // A request that gets no answer in 20 s fails with an error instead of hanging forever.
+  // A request that gets no answer in 8 s fails (a healthy call takes 2-6 s) with an error instead of hanging forever.
   const ai = new GoogleGenAI({
     vertexai: true,
     project,
     location,
-    httpOptions: { timeout: 20_000, retryOptions: { attempts: 2 } },
+    httpOptions: { timeout: 8_000, retryOptions: { attempts: 2 } },
   });
 
   return {
