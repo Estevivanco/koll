@@ -22,5 +22,7 @@
 
   { "request": "Varför hamnade Spotify i Prenumeration?", "expected": "none" },
   { "request": "Kategorisera och säg sen vad jag lagt mest på", "expected": "Koll Categorizer" },
-  { "request": "Hur många transaktioner saknar kategori just nu?", "expected": "Koll Analyst" }
+  { "request": "Hur många transaktioner saknar kategori just nu?", "expected": "Koll Analyst" },
+  { "request": "Varför blev ICA Mat och inte Restaurang?", "expected": "none" },
+  { "request": "Sortera mina köp och visa sen var jag handlar mest", "expected": "Koll Categorizer" }
 ]

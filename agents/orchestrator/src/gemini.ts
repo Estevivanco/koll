@@ -34,6 +34,10 @@ export function createGeminiRouter(): Router {
           `Agents:\n${describeAgents(agents)}\n\n` +
           `Rules:\n` +
           `- Answer with the agent's exact name, or "${NO_AGENT}" if no agent can handle the request.\n` +
+          `- If the request needs several agents, pick the agent for the FIRST step ` +
+          `(for example: categorize first, analyse after).\n` +
+          `- Pick "${NO_AGENT}" if the request asks WHY something got a category, or asks to add, change ` +
+          `or delete transactions, rules or files. No agent can do that.\n` +
           `- "message" is what we send to that agent. Keep the user's language (usually Swedish) ` +
           `and phrase it the way the agent's skill examples do.\n` +
           `- "reason" is one short sentence explaining the choice.\n\n` +
