@@ -1,6 +1,7 @@
-# The orchestrator isn't a server; it runs once per question. This pod just waits,
-# and you run the orchestrator inside it with:
+# The orchestrator runs as a web server (POST /api/ask, port 4000) for the website.
+# You can still ask from the terminal inside the same pod:
 #   kubectl exec -n koll deploy/orchestrator -- npx tsx agents/orchestrator/src/index.ts "Din fråga"
+# Reach the API from your Mac with: kubectl port-forward -n koll svc/orchestrator 4000:4000
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -23,7 +24,9 @@ spec:
         - name: orchestrator
           image: koll-agent:latest
           imagePullPolicy: Never
-          command: ["sleep", "infinity"]
+          command: ["npx", "tsx", "agents/orchestrator/src/server.ts"]
+          ports:
+            - containerPort: 4000
           # From your .env (Secret) and config.yaml (ConfigMap). If both have the same
           # name, the ConfigMap wins because it comes last, and env: below wins over both.
           envFrom:
@@ -41,7 +44,31 @@ spec:
             - name: gcloud
               mountPath: /gcloud
               readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 4000
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 4000
+            initialDelaySeconds: 15
+            periodSeconds: 20
       volumes:
         - name: gcloud
           secret:
             secretName: gcloud-adc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orchestrator
+  namespace: koll
+spec:
+  selector:
+    app: orchestrator
+  ports:
+    - port: 4000
+      targetPort: 4000

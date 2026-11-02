@@ -59,7 +59,21 @@ services:
     ports:
       - "127.0.0.1:4002:4002"
 
-  # Not started by `up`. Run it when you have a question:
+  # The orchestrator as a web server for the website (POST /api/ask). Started by `up`.
+  # Run the site against it with: npm run web:live
+  api:
+    <<: *agent
+    command: ["npx", "tsx", "agents/orchestrator/src/server.ts"]
+    environment:
+      <<: *agent-env
+      AGENT_URLS: http://categorizer:4001,http://analyst:4002
+    ports:
+      - "127.0.0.1:4000:4000"
+    depends_on:
+      - categorizer
+      - analyst
+
+  # Not started by `up`. Run it when you have a question in the terminal:
   #   docker compose run --rm orchestrator "Hur mycket la jag på mat i september?"
   orchestrator:
     <<: *agent

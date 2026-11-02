@@ -2,14 +2,20 @@
 
 The website for Koll: a hero, a month overview with charts, a terminal where visitors ask questions, and a diagram of how the agents work together.
 
-Right now it runs on **demo mode**: made-up data and scripted answers, so it needs no backend and spends no Gemini calls.
+It has two modes, chosen when it starts:
+
+- **Demo mode** (default): made-up data and scripted answers. No backend, no Gemini calls. Safe to show anyone.
+- **Live mode**: the terminal asks the real agents through the orchestrator's `POST /api/ask`, on your real data. Only for you, on your own machine. The overview and hero still show the demo numbers.
 
 ## Run it
 
 ```
-npm run web                      # from the repo root, then open http://localhost:5173
-npm run build -w @koll/web       # production build into apps/web/dist
+npm run web                      # demo mode, from the repo root, then open http://localhost:5173
+npm run web:live                 # live mode: needs the agents and the API running (docker compose up -d)
+npm run build -w @koll/web       # production build into apps/web/dist (demo mode)
 ```
+
+In live mode, Vite passes every `/api/...` request on to the orchestrator at `http://localhost:4000` (set `KOLL_API_URL` to change it), so the browser talks to one address and no CORS setup is needed.
 
 ## Folder structure
 
@@ -70,13 +76,15 @@ The chart colors were checked with the data-visualization palette validator (con
 
 The terminal never knows where answers come from. It consumes a stream of events (`agents`, `route`, `sql`, `rows`, `answer`, ...) defined in `src/api/types.ts`.
 
-- Today `src/api/index.ts` exports `ask = mockAsk`, which plays canned answers that follow the real agents' steps and wording.
-- Later, point `ask` at a function that calls the orchestrator's `POST /ask` and yields the same events as they stream in. Nothing else needs to change.
+- Demo mode: `ask = mockAsk` plays canned answers that follow the real agents' steps and wording.
+- Live mode: `ask = liveAsk` posts the question to `/api/ask` and yields the server's events as they stream in (NDJSON: one JSON event per line).
+- `src/api/types.ts` must match `agents/orchestrator/src/events.ts`.
+- The terminal's autoplay (one example question when it scrolls into view) only runs in demo mode, so live mode never spends Gemini calls on its own.
 
 All numbers on the page are invented. The real transactions never appear on the website.
 
 ## Not done yet
 
-- The orchestrator is still a terminal script. It needs to become a server with `POST /ask` (streaming events).
-- Before anything is public: a per-visitor rate limit, a length limit on questions, and a friendly message when the daily Gemini limit is reached.
+- Before anything is public: deploy only demo mode, or put a login in front of live mode. The server already limits question length and questions per visitor per hour (`ASK_LIMIT_PER_HOUR`, default 20), and shows a friendly message when the daily Gemini limit is reached.
+- The overview (hero, stat tiles, charts) uses demo numbers in both modes.
 - A light theme.

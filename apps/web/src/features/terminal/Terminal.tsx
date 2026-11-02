@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
-import { EXAMPLE_QUESTIONS, MAX_QUESTION_LENGTH, ask } from "../../api";
+import { EXAMPLE_QUESTIONS, LIVE, MAX_QUESTION_LENGTH, ask } from "../../api";
 import { Section } from "../../components/layout/Section";
 import { TerminalEntry } from "./TerminalEntry";
 import { useTerminal } from "./useTerminal";
@@ -15,11 +15,12 @@ export function Terminal() {
   const pastPosition = useRef<number | null>(null);
 
   // The first time the terminal scrolls into view it runs one example by itself,
-  // so visitors see it work without having to click. Demo mode costs nothing.
+  // so visitors see it work without having to click. Demo mode only: in live mode
+  // every autoplay would cost real Gemini calls just because someone scrolled.
   const autoplayed = useRef(false);
   useEffect(() => {
     const element = windowRef.current;
-    if (!element) return;
+    if (!element || LIVE) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting || autoplayed.current) return;
@@ -80,7 +81,11 @@ export function Terminal() {
       id="terminal"
       eyebrow="Try it"
       title="Ask in Swedish, watch the agents work"
-      intro="Demo mode: scripted answers on made-up data. The steps are the real ones: find the agents, route the question, write read-only SQL, explain the result."
+      intro={
+        LIVE
+          ? "Live mode: the real agents on your real data. Each question uses up to 3 Gemini calls."
+          : "Demo mode: scripted answers on made-up data. The steps are the real ones: find the agents, route the question, write read-only SQL, explain the result."
+      }
     >
       <div ref={windowRef} className={styles.window}>
         <div className={styles.titlebar} aria-hidden="true">
@@ -89,7 +94,7 @@ export function Terminal() {
             <span />
             <span />
           </span>
-          <span className={styles.title}>koll · demo mode</span>
+          <span className={styles.title}>koll · {LIVE ? "live" : "demo mode"}</span>
         </div>
 
         {/* A click on the log only moves the cursor to the input; the input stays the way to type */}
@@ -101,7 +106,9 @@ export function Terminal() {
           aria-label="Terminal output"
           onClick={focusInput}
         >
-          <p className={styles.welcome}>koll demo · made-up data, scripted answers</p>
+          <p className={styles.welcome}>
+            {LIVE ? "koll live · real agents, your own data" : "koll demo · made-up data, scripted answers"}
+          </p>
           <p className={styles.hint}>
             Pick an example below or type your own question. Type &quot;clear&quot; to start over.
           </p>

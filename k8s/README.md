@@ -41,6 +41,7 @@ docker compose exec -T db pg_dump -U koll -d koll -t transactions --no-owner \
 kubectl exec -n koll deploy/orchestrator -- npx tsx agents/orchestrator/src/index.ts "Hur mycket la jag på mat i september?"
 kubectl logs -n koll deploy/analyst
 kubectl port-forward -n koll svc/categorizer 14001:4001   # then open http://localhost:14001/.well-known/agent-card.json
+kubectl port-forward -n koll svc/orchestrator 4000:4000   # the website's API; then npm run web:live
 ```
 
 ## After a code change

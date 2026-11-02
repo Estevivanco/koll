@@ -19,7 +19,10 @@
     "scripts": {
         "lint": "eslint .",
         "usage": "bash scripts/usage.sh",
+        "api": "tsx --env-file=.env agents/orchestrator/src/server.ts",
         "web": "npm run dev -w @koll/web",
+        "web:live": "VITE_KOLL_MODE=live npm run dev -w @koll/web",
+        "eval:router": "tsx --env-file=.env agents/orchestrator/evals/router.eval.ts",
         "typecheck": "tsc -p packages/shared --noEmit && tsc -p packages/importer --noEmit && tsc -p packages/a2a --noEmit && tsc -p packages/budget --noEmit && tsc -p agents/categorizer --noEmit && tsc -p agents/analyst --noEmit && tsc -p agents/orchestrator --noEmit && tsc -p apps/web --noEmit  && tsc -p packages/mcp-server --noEmit"
     }
 }

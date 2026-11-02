@@ -16,7 +16,7 @@ const SAFEGUARDS = [
   },
   {
     title: "Read-only by design",
-    text: "The analyst's database login can only read one table. A bad query cannot change or leak anything else.",
+    text: "The analyst's database login can only read, never write. Even a bad query cannot change or delete anything.",
   },
   {
     title: "Capped spending",

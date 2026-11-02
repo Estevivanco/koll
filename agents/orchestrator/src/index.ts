@@ -1,18 +1,6 @@
-import { createMessage, readData, readText, textPart } from "@koll/a2a";
-import { discoverAgents } from "./agents.js";
-import { createGeminiRouter } from "./gemini.js";
-import { NO_AGENT, type Router } from "./router.js";
+import { askOrchestrator } from "./ask.js";
 
-// The ONE place that decides which AI does the routing
-function createRouter(): Router {
-  switch (process.env.AI_PROVIDER) {
-    case "gemini":
-      return createGeminiRouter();
-    default:
-      throw new Error(`Unknown AI_PROVIDER: ${process.env.AI_PROVIDER}`);
-  }
-}
-
+// Ask from the terminal. Uses exactly the same steps as the website (ask.ts).
 const request = process.argv.slice(2).join(" ");
 if (!request) {
   console.error(
@@ -21,40 +9,30 @@ if (!request) {
   process.exit(1);
 }
 
-// 1. Find out which agents exist and what they can do
-const agents = await discoverAgents();
-if (agents.length === 0) {
-  console.error("No agents are running. Start them first.");
-  process.exit(1);
+for await (const event of askOrchestrator(request)) {
+  switch (event.type) {
+    case "agents":
+      console.log(`Agents found: ${event.names.join(", ")}`);
+      break;
+    case "route":
+      if (event.agent === "none") console.log(`\nNo agent can handle that. ${event.reason}`);
+      else console.log(`→ ${event.agent}\n  Why: ${event.reason}\n`);
+      break;
+    case "sql":
+      console.log(`SQL:\n${event.sql}\n`);
+      break;
+    case "rows":
+      console.table(event.rows);
+      break;
+    case "answer":
+      console.log(`\n${event.text}`);
+      break;
+    case "notice":
+      console.log(event.text);
+      break;
+    case "error":
+      console.error(`! ${event.text}`);
+      process.exitCode = 1;
+      break;
+  }
 }
-console.log(`Agents found: ${agents.map((a) => a.name).join(", ")}`);
-
-// 2. Let the AI pick the agent
-const route = await createRouter().route(request, agents);
-const agent = agents.find((a) => a.name === route.agent);
-
-if (route.agent === NO_AGENT || !agent) {
-  console.log(`\nNo agent can handle that. ${route.reason}`);
-  process.exit(0);
-}
-console.log(`→ ${agent.name}: "${route.message}"`);
-console.log(`  Why: ${route.reason}\n`);
-
-// 3. Send the message to the chosen agent
-const result = await agent.client.sendMessage({
-  tenant: "",
-  message: createMessage("user", [textPart(route.message)]),
-  configuration: undefined,
-  metadata: {},
-});
-
-// 4. Print the answer. Agents can reply with a Message or a Task; ours send a Message.
-if (!("messageId" in result)) {
-  throw new Error(`Expected a message, got a task with state ${result.status?.state}`);
-}
-
-console.log(readText(result));
-
-const data = readData(result) as { sql?: string; rows?: unknown[] } | undefined;
-if (data?.sql) console.log(`\nSQL:\n${data.sql}`);
-if (data?.rows?.length) console.table(data.rows);
