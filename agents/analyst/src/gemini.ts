@@ -42,6 +42,9 @@ export function createGeminiModel(): AnalystModel {
           `per kategori) räknar INTE med överföringar mellan egna konton: lägg till category IS NULL OR ` +
           `category <> 'Överföring'. Hyra (category = 'Boende') räknas med. Vid en total, lägg till kolumnen ` +
           `-SUM(amount) FILTER (WHERE category = 'Boende') AS varav_hyra, så att hyran kan nämnas separat.\n` +
+          `- Ge aldrig en kolumn samma namn som en kolumn i tabellen (skriv inte ABS(amount) AS amount): ORDER BY ` +
+          `använder då det nya värdet och sorterar fel. Den dyraste utgiften är ORDER BY amount ASC (mest negativt), ` +
+          `visa den gärna som ABS(amount) AS belopp.\n` +
           `- Dagens datum är ${today}. "I september" betyder senaste september.\n\n` +
           `Fråga: ${question}`,
         config: {

@@ -30,7 +30,8 @@ const RULES: Rule[] = [
   { match: "DJURGARDSBUNN", category: "Restaurang" },
 
   // Both rackethalls (Enskede and Skogås). Not Hälsa, so it doesn't get mixed up with Apoteket.
-  { match: "RACKETHALL", category: "Nöje" },
+  // The bank cuts the name short ("ENSKEDE RACKETH"), so match the start of the word.
+  { match: "RACKETH", category: "Nöje" },
 
   // Insurance. Under Prenumeration so the subscription hunter finds it.
   { match: "CHUBB", category: "Prenumeration" },
