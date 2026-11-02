@@ -26,8 +26,8 @@ const RULES: Rule[] = [
 
   // Cafés count as Restaurang: the analyst already adds Restaurang to "mat"
   { match: "ESPRESSO HOUSE", category: "Restaurang" },
-  { match: "DJURGÅRDSBUNN", category: "Restaurang" },
-  { match: "DJURGARDSBUNN", category: "Restaurang" },
+  { match: "DJURGÅRDSBRUNN", category: "Restaurang" },
+  { match: "DJURGARDSBRUNN", category: "Restaurang" }, // how the bank writes it
 
   // Both rackethalls (Enskede and Skogås). Not Hälsa, so it doesn't get mixed up with Apoteket.
   // The bank cuts the name short ("ENSKEDE RACKETH"), so match the start of the word.
