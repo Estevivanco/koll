@@ -1,4 +1,4 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI, ThinkingLevel, Type } from "@google/genai";
 import { reserveGeminiCall } from "@koll/budget";
 import type { AnalystModel } from "./model.js";
 import { SCHEMA } from "./schema.js";
@@ -38,6 +38,10 @@ export function createGeminiModel(): AnalystModel {
           `- Frågor om butiker, ställen eller var man handlar gäller bara vanliga köp. Utesluta alltid de stora ` +
           `posterna: category NOT IN ('Överföring', 'Boende', 'Lön', 'Studiemedel') (och category kan vara NULL, ` +
           `så skriv category IS NULL OR category NOT IN (...)).\n` +
+          `- Frågor om hur mycket man spenderat, utgifter eller kostnader i allmänhet (totalt, per månad, uppdelat ` +
+          `per kategori) räknar INTE med överföringar mellan egna konton: lägg till category IS NULL OR ` +
+          `category <> 'Överföring'. Hyra (category = 'Boende') räknas med. Vid en total, lägg till kolumnen ` +
+          `-SUM(amount) FILTER (WHERE category = 'Boende') AS varav_hyra, så att hyran kan nämnas separat.\n` +
           `- Dagens datum är ${today}. "I september" betyder senaste september.\n\n` +
           `Fråga: ${question}`,
         config: {
@@ -61,8 +65,11 @@ export function createGeminiModel(): AnalystModel {
         contents:
           `Svara kort på svenska (1-3 meningar) på frågan, med hjälp av resultatet nedan.\n` +
           `Använd bara siffrorna i resultatet. Hitta aldrig på siffror. Avrunda till hela kronor.\n` +
-          `Om resultatet är tomt, säg att det inte finns några matchande transaktioner.\n\n` +
+          `Om resultatet är tomt, säg att det inte finns några matchande transaktioner.\n` +
+          `Om resultatet har kolumnen varav_hyra, nämn hyran separat, t.ex. "varav 5 208 kr hyra".\n\n` +
           `Fråga: ${question}\nSQL: ${sql}\nResultat (JSON): ${JSON.stringify(rows)}`,
+        // Putting a number into a sentence needs almost no thinking. The SQL step above keeps the default.
+        config: { thinkingConfig: { thinkingLevel: ThinkingLevel.LOW } },
       });
       return response.text?.trim() ?? "";
     },

@@ -24,5 +24,8 @@
   { "request": "Kategorisera och säg sen vad jag lagt mest på", "expected": "Koll Categorizer" },
   { "request": "Hur många transaktioner saknar kategori just nu?", "expected": "Koll Analyst" },
   { "request": "Varför blev ICA Mat och inte Restaurang?", "expected": "none" },
-  { "request": "Sortera mina köp och visa sen var jag handlar mest", "expected": "Koll Categorizer" }
+  { "request": "Sortera mina köp och visa sen var jag handlar mest", "expected": "Koll Categorizer" },
+
+  { "request": "Dela upp mina utgifter i september per kategori", "expected": "Koll Analyst" },
+  { "request": "Kan du dela upp det. Hur kom du fram till den summan", "expected": "Koll Analyst" }
 ]

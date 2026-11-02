@@ -18,6 +18,23 @@ const RULES: Rule[] = [
   { match: "CIRCLE K", when: (spent) => spent >= 350, category: "Transport" }, // rented car
   { match: "CIRCLE K", when: (spent) => spent >= 45 && spent <= 55, category: "Tobak" }, // snus
   { match: "CIRCLE K", when: (spent) => spent > 0, category: "Mat" }, // food and drinks
+
+  // Pressbyrån: snus costs 45-55 kr, cheaper is snacks or a drink. Dearer is a mix, so the AI decides.
+  // (The bank writes it without the å.)
+  { match: "PRESSBYRAN", when: (spent) => spent >= 45 && spent <= 55, category: "Tobak" },
+  { match: "PRESSBYRAN", when: (spent) => spent > 0 && spent < 45, category: "Mat" },
+
+  // Cafés count as Restaurang: the analyst already adds Restaurang to "mat"
+  { match: "ESPRESSO HOUSE", category: "Restaurang" },
+  { match: "DJURGÅRDSBUNN", category: "Restaurang" },
+  { match: "DJURGARDSBUNN", category: "Restaurang" },
+
+  // Both rackethalls (Enskede and Skogås). Not Hälsa, so it doesn't get mixed up with Apoteket.
+  { match: "RACKETHALL", category: "Nöje" },
+
+  // Insurance. Under Prenumeration so the subscription hunter finds it.
+  { match: "CHUBB", category: "Prenumeration" },
+
   { match: "CSN", category: "Studiemedel" },
 ];
 

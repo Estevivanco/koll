@@ -1,0 +1,72 @@
+[
+  {
+    "date": "2026-09-02",
+    "counterparty": "ICA MAXI LINDHAGEN",
+    "description": "KORTKÖP",
+    "amount": -412.5,
+    "expected": "Mat"
+  },
+  {
+    "date": "2026-09-03",
+    "counterparty": "SL ACCESS",
+    "description": "KORTKÖP",
+    "amount": -1060,
+    "expected": "Transport"
+  },
+  {
+    "date": "2026-09-05",
+    "counterparty": "SPOTIFY P3F2A1",
+    "description": "KORTKÖP",
+    "amount": -129,
+    "expected": "Prenumeration"
+  },
+  {
+    "date": "2026-09-06",
+    "counterparty": "ESPRESSO HOUSE",
+    "description": "KORTKÖP",
+    "amount": -58,
+    "expected": "Restaurang"
+  },
+  {
+    "date": "2026-09-08",
+    "counterparty": "APOTEK HJARTAT",
+    "description": "KORTKÖP",
+    "amount": -189,
+    "expected": "Hälsa"
+  },
+  {
+    "date": "2026-09-10",
+    "counterparty": "H&M SERGELS TORG",
+    "description": "KORTKÖP",
+    "amount": -399,
+    "expected": "Shopping"
+  },
+  {
+    "date": "2026-09-12",
+    "counterparty": "SF BIO",
+    "description": "KORTKÖP",
+    "amount": -165,
+    "expected": "Nöje"
+  },
+  {
+    "date": "2026-09-25",
+    "counterparty": "CSN",
+    "description": "STUDIEMEDEL",
+    "amount": 12000,
+    "expected": "Studiemedel"
+  },
+  {
+    "date": "2026-09-27",
+    "counterparty": "HYRESVÄRD AB",
+    "description": "HYRA OKT",
+    "amount": -6200,
+    "expected": "Boende"
+  },
+  {
+    "date": "2026-09-28",
+    "counterparty": "ÖVERFÖRING",
+    "description": "TILL SPARKONTO",
+    "amount": -1000,
+    "expected": "Överföring"
+  }
+]

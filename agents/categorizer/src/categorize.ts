@@ -3,8 +3,8 @@ import { createGeminiProvider } from "./gemini.js";
 import type { CategorizerProvider } from "./provider.js";
 import { applyRules } from "./rules.js";
 
-// The ONE place that decides which AI is used
-function createProvider(): CategorizerProvider {
+// The ONE place that decides which AI is used (exported for the evals)
+export function createProvider(): CategorizerProvider {
   switch (process.env.AI_PROVIDER) {
     case "gemini":
       return createGeminiProvider();

@@ -1,0 +1,76 @@
+[
+  {
+    "question": "Hur mycket la jag på mat i september?",
+    "truth_sql": "SELECT -SUM(amount) FROM transactions WHERE amount < 0 AND category IN ('Mat', 'Restaurang') AND date >= '2026-09-01' AND date < '2026-10-01'"
+  },
+  {
+    "question": "Hur mycket la jag på restaurang i augusti?",
+    "truth_sql": "SELECT -SUM(amount) FROM transactions WHERE amount < 0 AND category = 'Restaurang' AND date >= '2026-08-01' AND date < '2026-09-01'"
+  },
+  {
+    "question": "Hur mycket i lön fick jag i september?",
+    "truth_sql": "SELECT SUM(amount) FROM transactions WHERE amount > 0 AND category = 'Lön' AND date >= '2026-09-01' AND date < '2026-10-01'"
+  },
+  {
+    "question": "Hur många gånger har jag handlat på Circle K?",
+    "truth_sql": "SELECT COUNT(*) FROM transactions WHERE amount < 0 AND counterparty ILIKE '%circle k%'"
+  },
+  {
+    "question": "Vad var min dyraste enskilda utgift i oktober?",
+    "truth_sql": "SELECT -MIN(amount) FROM transactions WHERE amount < 0 AND date >= '2026-10-01' AND date < '2026-11-01'"
+  },
+  {
+    "question": "Hur mycket har jag betalat till GitHub totalt?",
+    "truth_sql": "SELECT -SUM(amount) FROM transactions WHERE amount < 0 AND counterparty ILIKE '%github%'"
+  },
+  {
+    "question": "Hur mycket la jag på tobak i september?",
+    "truth_sql": "SELECT -SUM(amount) FROM transactions WHERE amount < 0 AND category = 'Tobak' AND date >= '2026-09-01' AND date < '2026-10-01'"
+  },
+  {
+    "question": "Hur många transaktioner har jag i september?",
+    "truth_sql": "SELECT COUNT(*) FROM transactions WHERE date >= '2026-09-01' AND date < '2026-10-01'"
+  },
+
+  {
+    "question": "Hur stor var skillnaden i matutgifter mellan augusti och september?",
+    "truth_sql": "SELECT ABS(SUM(amount) FILTER (WHERE date >= '2026-08-01' AND date < '2026-09-01') - SUM(amount) FILTER (WHERE date >= '2026-09-01' AND date < '2026-10-01')) FROM transactions WHERE amount < 0 AND category IN ('Mat', 'Restaurang') AND date >= '2026-08-01' AND date < '2026-10-01'"
+  },
+  {
+    "question": "Hur mycket har jag handlat på ICA totalt?",
+    "truth_sql": "SELECT -SUM(amount) FROM transactions WHERE amount < 0 AND counterparty ILIKE '%ica%'"
+  },
+  {
+    "question": "Hur mycket betalade jag för prenumerationer i oktober?",
+    "truth_sql": "SELECT -SUM(amount) FROM transactions WHERE amount < 0 AND category = 'Prenumeration' AND date >= '2026-10-01' AND date < '2026-11-01'"
+  },
+  {
+    "question": "Hur mycket studiemedel fick jag i september?",
+    "truth_sql": "SELECT SUM(amount) FROM transactions WHERE amount > 0 AND category = 'Studiemedel' AND date >= '2026-09-01' AND date < '2026-10-01'"
+  },
+  {
+    "question": "hur mkt la jag på boende i sept",
+    "truth_sql": "SELECT -SUM(amount) FROM transactions WHERE amount < 0 AND category = 'Boende' AND date >= '2026-09-01' AND date < '2026-10-01'"
+  },
+  {
+    "question": "Hur mycket spenderade jag på transport mellan 1 och 15 september?",
+    "truth_sql": "SELECT -SUM(amount) FROM transactions WHERE amount < 0 AND category = 'Transport' AND date >= '2026-09-01' AND date < '2026-09-16'"
+  },
+  {
+    "question": "Vad är mitt genomsnittliga köp hos Pressbyrån?",
+    "truth_sql": "SELECT -AVG(amount) FROM transactions WHERE amount < 0 AND counterparty ILIKE '%pressbyran%'"
+  },
+  {
+    "question": "Hur mycket la jag på mat i juli?",
+    "truth_sql": "SELECT -SUM(amount) FROM transactions WHERE amount < 0 AND category IN ('Mat', 'Restaurang') AND date >= '2026-07-01' AND date < '2026-08-01'"
+  },
+
+  {
+    "question": "Hur mycket spenderade jag totalt i september?",
+    "truth_sql": "SELECT -SUM(amount) FROM transactions WHERE amount < 0 AND (category IS NULL OR category <> 'Överföring') AND date >= '2026-09-01' AND date < '2026-10-01'"
+  },
+  {
+    "question": "Dela upp mina utgifter i september per kategori",
+    "truth_sql": "SELECT -SUM(amount) FROM transactions WHERE amount < 0 AND category = 'Mat' AND date >= '2026-09-01' AND date < '2026-10-01'"
+  }
+]
