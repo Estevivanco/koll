@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatCompact, formatKr, formatPercent } from "./format";
+import { formatCompact, formatKr, formatPercent } from "../../src/lib/format";
 
 // Swedish number format uses a non-breaking space between thousands. Treat any space as the same.
 const plain = (s: string) => s.replace(/\s/g, " ");

@@ -5,7 +5,7 @@ async function loadCard(host: string | undefined) {
   vi.resetModules();
   if (host === undefined) vi.stubEnv("PUBLIC_HOST", undefined);
   else vi.stubEnv("PUBLIC_HOST", host);
-  return import("./card.js");
+  return import("../src/card.js");
 }
 
 const input = {

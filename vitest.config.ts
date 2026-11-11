@@ -5,18 +5,16 @@ import { defineConfig } from "vitest/config";
   One test run, two environments ("projects"):
     - node: agents and packages. Plain Node, no browser.
     - web:  the website. jsdom is a pretend browser (document, window) that runs inside Node.
-  Tests sit next to the code they test: rules.ts -> rules.test.ts.
+  Tests sit in a tests/ folder next to src/, with the same file names: src/rules.ts -> tests/rules.test.ts.
 */
 export default defineConfig({
   test: {
-    // Remove this once there are real tests, so an empty or misconfigured run fails loudly
-    passWithNoTests: true,
     projects: [
       {
         test: {
           name: "node",
           environment: "node",
-          include: ["{agents,packages}/**/src/**/*.test.ts"],
+          include: ["{agents,packages}/*/tests/**/*.test.ts"],
         },
       },
       {
@@ -24,7 +22,7 @@ export default defineConfig({
         test: {
           name: "web",
           environment: "jsdom",
-          include: ["apps/web/src/**/*.test.{ts,tsx}"],
+          include: ["apps/web/tests/**/*.test.{ts,tsx}"],
         },
       },
     ],

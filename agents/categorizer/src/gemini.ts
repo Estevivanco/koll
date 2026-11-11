@@ -1,7 +1,7 @@
 import { GoogleGenAI, Type, ThinkingLevel } from "@google/genai";
 import { reserveGeminiCall } from "@koll/budget";
 import { CATEGORIES, type Category } from "@koll/shared";
-import type { CategorizerProvider } from "./provider.js";
+import type { CategorizerProvider, CategoryResult } from "./provider.js";
 
 export function createGeminiProvider(): CategorizerProvider {
   const project = process.env.GOOGLE_CLOUD_PROJECT;
@@ -54,18 +54,19 @@ export function createGeminiProvider(): CategorizerProvider {
         },
       });
 
-      const parsed = JSON.parse(response.text ?? "[]") as {
-        id: string;
-        category: string;
-      }[];
-
-      // Never trust the AI blindly: anything outside the list becomes "Övrigt"
-      return parsed.map((r) => ({
-        id: r.id,
-        category: isCategory(r.category) ? r.category : "Övrigt",
-      }));
+      return parseCategories(response.text);
     },
   };
+}
+
+// Turns the model's JSON answer into results.
+// Never trust the AI blindly: anything outside the list becomes "Övrigt"
+export function parseCategories(text: string | undefined): CategoryResult[] {
+  const parsed = JSON.parse(text ?? "[]") as { id: string; category: string }[];
+  return parsed.map((r) => ({
+    id: r.id,
+    category: isCategory(r.category) ? r.category : "Övrigt",
+  }));
 }
 
 function isCategory(value: string): value is Category {

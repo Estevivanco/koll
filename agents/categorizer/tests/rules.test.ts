@@ -1,6 +1,6 @@
 import type { Transaction } from "@koll/shared";
 import { describe, expect, it } from "vitest";
-import { applyRules } from "./rules.js";
+import { applyRules } from "../src/rules.js";
 
 // Money out is negative, so spending 400 kr is amount -400
 let counter = 0;

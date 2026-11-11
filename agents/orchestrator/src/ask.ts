@@ -71,7 +71,7 @@ export async function* askOrchestrator(request: string): AsyncGenerator<AskEvent
 
 // Postgres sends numbers like "401.50" as text. Turn them back into numbers,
 // so the website can format them and draw bars.
-function cleanRow(row: Record<string, unknown>): ResultRow {
+export function cleanRow(row: Record<string, unknown>): ResultRow {
   const clean: ResultRow = {};
   for (const [key, value] of Object.entries(row)) {
     if (typeof value === "number") clean[key] = value;
@@ -82,18 +82,19 @@ function cleanRow(row: Record<string, unknown>): ResultRow {
 }
 
 // Turns technical errors into something a visitor can act on. The full error goes to the server log.
-function friendlyError(error: unknown): string {
+export function friendlyError(error: unknown): string {
   const message = error instanceof Error ? error.message : String(error);
   console.error("[ask]", message);
 
   if (message.includes("Daily Gemini limit reached")) {
     return "Today's limit for AI calls is reached. Try again tomorrow.";
   }
-  if (/timeout|timed out|abort|DEADLINE_EXCEEDED|504/i.test(message)) {
-    return "Gemini didn't answer in time. Try again in a moment.";
-  }
+  // Before the timeout check: this message ends with the database's own error, which can say "timeout"
   if (message.includes("Could not check the daily Gemini limit")) {
     return "The AI is paused because the usage counter can't be reached.";
+  }
+  if (/timeout|timed out|abort|DEADLINE_EXCEEDED|504/i.test(message)) {
+    return "Gemini didn't answer in time. Try again in a moment.";
   }
   return "Something went wrong while answering. Try again.";
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseSwedbank } from "./swedbank.js";
+import { parseSwedbank } from "../src/swedbank.js";
 
 // Swedbank's real column order. The header text is ignored by the parser, so any header works.
 const HEADER =

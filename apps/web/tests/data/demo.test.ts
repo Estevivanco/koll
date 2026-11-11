@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { LAST_FULL_MONTH, MONTHS, PREVIOUS_MONTH, TREND, totalSpent, type MonthDetail } from "./demo";
+import { LAST_FULL_MONTH, MONTHS, PREVIOUS_MONTH, TREND, totalSpent, type MonthDetail } from "../../src/data/demo";
 
 describe("totalSpent", () => {
   it("adds up the categories", () => {

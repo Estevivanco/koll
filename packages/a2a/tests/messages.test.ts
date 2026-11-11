@@ -1,6 +1,6 @@
 import { Role } from "@a2a-js/sdk";
 import { describe, expect, it } from "vitest";
-import { createMessage, dataPart, readData, readText, textPart } from "./messages.js";
+import { createMessage, dataPart, readData, readText, textPart } from "../src/messages.js";
 
 describe("text", () => {
   it("comes back out the way it went in", () => {

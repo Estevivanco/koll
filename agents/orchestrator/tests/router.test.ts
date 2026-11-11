@@ -1,6 +1,6 @@
 import { createAgentCard } from "@koll/a2a";
 import { describe, expect, it } from "vitest";
-import { describeAgents, type AgentInfo } from "./router.js";
+import { describeAgents, type AgentInfo } from "../src/router.js";
 
 function agent(
   name: string,

@@ -58,15 +58,19 @@ export function createGeminiRouter(): Router {
         },
       });
 
-      const parsed = JSON.parse(response.text ?? "{}") as Partial<Route>;
-
-      // Never trust the AI blindly: an unknown name becomes "no agent"
-      const agent = parsed.agent && names.includes(parsed.agent) ? parsed.agent : NO_AGENT;
-      return {
-        agent,
-        message: parsed.message || request,
-        reason: parsed.reason ?? "",
-      };
+      return parseRoute(response.text, names, request);
     },
+  };
+}
+
+// Turns the model's JSON answer into a route.
+// Never trust the AI blindly: an unknown name becomes "no agent", an empty message becomes the original request
+export function parseRoute(text: string | undefined, names: string[], request: string): Route {
+  const parsed = JSON.parse(text ?? "{}") as Partial<Route>;
+  const agent = parsed.agent && names.includes(parsed.agent) ? parsed.agent : NO_AGENT;
+  return {
+    agent,
+    message: parsed.message || request,
+    reason: parsed.reason ?? "",
   };
 }

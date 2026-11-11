@@ -56,9 +56,7 @@ export function createGeminiModel(): AnalystModel {
           },
         },
       });
-      const parsed = JSON.parse(response.text ?? "{}") as { sql?: string };
-      if (!parsed.sql) throw new Error("The model returned no SQL");
-      return parsed.sql;
+      return parseSql(response.text);
     },
 
     async explain(question, sql, rows) {
@@ -77,4 +75,11 @@ export function createGeminiModel(): AnalystModel {
       return response.text?.trim() ?? "";
     },
   };
+}
+
+// Pulls the SQL out of the model's JSON answer. Throws if there is none.
+export function parseSql(text: string | undefined): string {
+  const parsed = JSON.parse(text ?? "{}") as { sql?: string };
+  if (!parsed.sql) throw new Error("The model returned no SQL");
+  return parsed.sql;
 }
