@@ -1,7 +1,7 @@
 import type { Server } from "node:http";
 import type { AddressInfo } from "node:net";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createApp } from "../src/app.js";
+import { createApp, parseTrustProxy } from "../src/app.js";
 import type { AskEvent } from "../src/events.js";
 
 // The web server's rules (what is refused, how often, how answers stream) with a fake "ask":
@@ -238,5 +238,54 @@ describe("POST /api/ask: the answer", () => {
     controller.abort(); // ... and then left
 
     await vi.waitFor(() => expect(stopped).toBe(true), { timeout: 2000 });
+  });
+});
+
+describe("behind a proxy (TRUST_PROXY)", () => {
+  const asVisitor = (address: string): RequestInit => ({
+    headers: { "Content-Type": "application/json", "X-Forwarded-For": address },
+  });
+
+  it("gives every visitor their own limit when one proxy is trusted", async () => {
+    const ask = fakeAsk({ type: "answer", text: "ok" });
+    const { post } = start({ ask, limitPerHour: 1, trustProxy: 1 });
+
+    expect((await post({ question: "a" }, asVisitor("203.0.113.1"))).status).toBe(200);
+    expect((await post({ question: "b" }, asVisitor("203.0.113.1"))).status).toBe(429); // the same visitor
+    expect((await post({ question: "c" }, asVisitor("203.0.113.2"))).status).toBe(200); // another visitor
+  });
+
+  it("is not fooled by a made-up address in front of the real one", async () => {
+    const ask = fakeAsk({ type: "answer", text: "ok" });
+    const { post } = start({ ask, limitPerHour: 1, trustProxy: 1 });
+
+    // The proxy adds the real address last. Whatever the visitor puts first is ignored.
+    expect((await post({ question: "a" }, asVisitor("1.1.1.1, 203.0.113.1"))).status).toBe(200);
+    expect((await post({ question: "b" }, asVisitor("2.2.2.2, 203.0.113.1"))).status).toBe(429);
+  });
+
+  it("still ignores X-Forwarded-For when no proxy is trusted (the default)", async () => {
+    const ask = fakeAsk({ type: "answer", text: "ok" });
+    const { post } = start({ ask, limitPerHour: 1 });
+
+    expect((await post({ question: "a" }, asVisitor("203.0.113.1"))).status).toBe(200);
+    expect((await post({ question: "b" }, asVisitor("203.0.113.2"))).status).toBe(429);
+  });
+});
+
+describe("parseTrustProxy", () => {
+  it.each([
+    [undefined, 0],
+    ["", 0],
+    ["  ", 0],
+    ["0", 0],
+    ["1", 1],
+    [" 2 ", 2],
+  ])("reads %j as %s", (value, expected) => {
+    expect(parseTrustProxy(value)).toBe(expected);
+  });
+
+  it.each(["true", "false", "yes", "1.5", "-1", "loopback", "10.0.0.1"])("refuses %j", (value) => {
+    expect(() => parseTrustProxy(value)).toThrow("TRUST_PROXY must be the number of proxies");
   });
 });
