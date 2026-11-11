@@ -13,3 +13,7 @@ data:
   # Max Gemini calls per day across all agents
   GEMINI_DAILY_LIMIT: "150"
   ROUTER_MODEL: gemini-3.5-flash-lite
+  # Proxies in front of the API (load balancer or ingress), so the hourly question limit sees each
+  # visitor's own address. A number only, never "true". With kubectl port-forward there is no proxy,
+  # so this only matters once the API is behind one. Check the number at deploy time.
+  TRUST_PROXY: "1"
