@@ -1,5 +1,5 @@
 # One image for every agent. docker-compose.yml decides which agent each container runs.
-FROM node:22-slim
+FROM node:24-slim
 
 WORKDIR /app
 
