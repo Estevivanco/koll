@@ -71,10 +71,10 @@ describe("checkSql", () => {
     });
   });
 
-  // Known gap: this text check can't see that the WITH query changes data.
-  // What stops it is the READ ONLY transaction and the read-only analyst login (db.ts).
-  // Proving that needs a real Postgres, so it belongs in an integration test.
-  it("lets a data-changing WITH query through (Postgres has to refuse it)", () => {
+  // This text check can't see that the WITH query changes data. Postgres refuses it later: runReadOnly wraps the
+  // SQL in a subquery, where a data-changing WITH is an error. That, and the READ ONLY transaction and the
+  // read-only analyst login, are proved in tests/integration/runReadOnly.int.test.ts (needs a real Postgres).
+  it("lets a data-changing WITH query through (a later layer refuses it)", () => {
     expect(() => checkSql("WITH x AS (DELETE FROM transactions RETURNING *) SELECT * FROM x")).not.toThrow();
   });
 });
