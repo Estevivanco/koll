@@ -48,26 +48,27 @@ flowchart TB
 
 ## Components
 
-| Component | Status | What it does | Code |
-|---|---|---|---|
-| Importer | Built | Converts bank CSV rows into a shared `Transaction` format and stores them. Re-importing a file creates no duplicates. | `packages/importer/` |
-| Postgres | Built | Stores transactions and categories. Runs in Docker. Has a separate read-only login used by the analyst and the MCP server. | `docker-compose.yml`, `db/init/` |
-| Shared types | Built | The `Transaction` type and category list every component uses. | `packages/shared/` |
-| A2A helpers | Built | Builds messages and agent cards and starts agent servers, so each agent only contains its own logic. | `packages/a2a/` |
-| Categorizer agent | Built | Applies user-defined rules first, sends the rest to the model, and saves the categories. Runs as its own A2A server. | `agents/categorizer/` |
-| Orchestrator | Built | Discovers agents through their agent cards, lets the model choose which agent should handle a request (and explain why), then sends it over A2A. | `agents/orchestrator/` |
-| Model provider | Built | Gemini via Vertex AI, behind an interface in each agent so the model can be swapped. | `provider.ts` / `model.ts` / `router.ts` |
-| Analyst agent | Built | Turns a question in plain Swedish into SQL, runs it with read-only access, and explains the result. Returns the SQL so every answer can be checked. | `agents/analyst/` |
-| MCP server | Built | Four read-only tools for MCP clients such as Claude Desktop: spending by category, transaction search, monthly totals and recurring payments. Fixed, parameterized SQL. | `packages/mcp-server/` |
-| Subscription hunter | Planned | Finds recurring charges and price changes. | |
-| Evals | Planned | An answer key and accuracy measurement for the categorizer and analyst. | |
-| React UI | Planned | Chat interface with a live view of agents working. | |
+| Component           | Status  | What it does                                                                                                                                                            | Code                                     |
+| ------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| Importer            | Built   | Converts bank CSV rows into a shared `Transaction` format and stores them. Re-importing a file creates no duplicates.                                                   | `packages/importer/`                     |
+| Postgres            | Built   | Stores transactions and categories. Runs in Docker. Has a separate read-only login used by the analyst and the MCP server.                                              | `docker-compose.yml`, `db/init/`         |
+| Shared types        | Built   | The `Transaction` type and category list every component uses.                                                                                                          | `packages/shared/`                       |
+| A2A helpers         | Built   | Builds messages and agent cards and starts agent servers, so each agent only contains its own logic.                                                                    | `packages/a2a/`                          |
+| Categorizer agent   | Built   | Applies user-defined rules first, sends the rest to the model, and saves the categories. Runs as its own A2A server.                                                    | `agents/categorizer/`                    |
+| Orchestrator        | Built   | Discovers agents through their agent cards, lets the model choose which agent should handle a request (and explain why), then sends it over A2A.                        | `agents/orchestrator/`                   |
+| Model provider      | Built   | Gemini via Vertex AI, behind an interface in each agent so the model can be swapped.                                                                                    | `provider.ts` / `model.ts` / `router.ts` |
+| Analyst agent       | Built   | Turns a question in plain Swedish into SQL, runs it with read-only access, and explains the result. Returns the SQL so every answer can be checked.                     | `agents/analyst/`                        |
+| MCP server          | Built   | Four read-only tools for MCP clients such as Claude Desktop: spending by category, transaction search, monthly totals and recurring payments. Fixed, parameterized SQL. | `packages/mcp-server/`                   |
+| Subscription hunter | Planned | Finds recurring charges and price changes.                                                                                                                              |                                          |
+| Evals               | Planned | An answer key and accuracy measurement for the categorizer and analyst.                                                                                                 |                                          |
+| React UI            | Planned | Chat interface with a live view of agents working.                                                                                                                      |                                          |
 
 ## Request flows
 
 **Import:** bank CSV → importer converts each row → Postgres.
 
 **Categorize (working):**
+
 1. The orchestrator fetches the categorizer's agent card from `/.well-known/agent-card.json`.
 2. It sends an A2A message: "Kategorisera 10 transaktioner".
 3. The categorizer reads uncategorized transactions from Postgres.
@@ -76,6 +77,7 @@ flowchart TB
 6. Categories are saved, and the agent replies with a text summary and structured data.
 
 **Ask a question (working):**
+
 1. The orchestrator fetches every agent card and gives the model the list of agents and their skills.
 2. The model picks the analyst and explains why. It can only answer with agents that exist, or "none".
 3. The analyst has the model write one SQL query and runs it with five safety layers: SELECT only, one statement, a read-only transaction, time and row limits, and a database login that cannot write.

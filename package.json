@@ -1,32 +1,35 @@
 {
-    "name": "koll",
-    "private": true,
-    "type": "module",
-    "workspaces": [
-        "packages/*",
-        "agents/*",
-        "apps/*"
-    ],
-    "devDependencies": {
-        "@eslint/js": "^10.0.1",
-        "@types/node": "^26.6.5",
-        "eslint": "^10.13.0",
-        "eslint-plugin-react-hooks": "^7.1.1",
-        "tsx": "^4.23.15",
-        "typescript": "6.0",
-        "typescript-eslint": "^8.72.0"
-    },
-    "scripts": {
-        "lint": "eslint .",
-        "usage": "bash scripts/usage.sh",
-        "api": "tsx --env-file=.env agents/orchestrator/src/server.ts",
-        "web": "npm run dev -w @koll/web",
-        "web:live": "VITE_KOLL_MODE=live npm run dev -w @koll/web",
-        "eval:router": "tsx --env-file=.env agents/orchestrator/evals/router.eval.ts",
-        "eval:categorizer": "tsx --env-file=.env agents/categorizer/evals/categorizer.eval.ts",
-        "eval:categorizer:prepare": "tsx --env-file=.env agents/categorizer/evals/make-cases.ts",
-        "eval:analyst": "tsx --env-file=.env agents/analyst/evals/analyst.eval.ts",
-        "evals": "npm run eval:router && npm run eval:categorizer && npm run eval:analyst",
-        "typecheck": "tsc -p packages/shared --noEmit && tsc -p packages/importer --noEmit && tsc -p packages/a2a --noEmit && tsc -p packages/budget --noEmit && tsc -p agents/categorizer --noEmit && tsc -p agents/analyst --noEmit && tsc -p agents/orchestrator --noEmit && tsc -p apps/web --noEmit  && tsc -p packages/mcp-server --noEmit"
-    }
+  "name": "koll",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "agents/*",
+    "apps/*"
+  ],
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.6.5",
+    "eslint": "^10.13.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "prettier": "^3.9.10",
+    "tsx": "^4.23.15",
+    "typescript": "6.0",
+    "typescript-eslint": "^8.72.0"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "usage": "bash scripts/usage.sh",
+    "api": "tsx --env-file=.env agents/orchestrator/src/server.ts",
+    "web": "npm run dev -w @koll/web",
+    "web:live": "VITE_KOLL_MODE=live npm run dev -w @koll/web",
+    "eval:router": "tsx --env-file=.env agents/orchestrator/evals/router.eval.ts",
+    "eval:categorizer": "tsx --env-file=.env agents/categorizer/evals/categorizer.eval.ts",
+    "eval:categorizer:prepare": "tsx --env-file=.env agents/categorizer/evals/make-cases.ts",
+    "eval:analyst": "tsx --env-file=.env agents/analyst/evals/analyst.eval.ts",
+    "evals": "npm run eval:router && npm run eval:categorizer && npm run eval:analyst",
+    "typecheck": "tsc -p packages/shared --noEmit && tsc -p packages/importer --noEmit && tsc -p packages/a2a --noEmit && tsc -p packages/budget --noEmit && tsc -p agents/categorizer --noEmit && tsc -p agents/analyst --noEmit && tsc -p agents/orchestrator --noEmit && tsc -p apps/web --noEmit  && tsc -p packages/mcp-server --noEmit"
+  }
 }

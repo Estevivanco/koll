@@ -5,8 +5,7 @@ x-agent: &agent
   build: .
   image: koll-agent
   env_file: .env
-  environment: &agent-env
-    # Inside Docker the database is reached by its service name "db", not localhost
+  environment: &agent-env # Inside Docker the database is reached by its service name "db", not localhost
     DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
     ANALYST_DATABASE_URL: postgres://analyst_ro:${ANALYST_DB_PASSWORD}@db:5432/${POSTGRES_DB}
     # Can only touch the daily Gemini call counter
