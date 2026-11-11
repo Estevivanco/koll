@@ -4,14 +4,18 @@ import { ClientFactory, type Client } from "@a2a-js/sdk/client";
 export type KnownAgent = { name: string; card: AgentCard; client: Client };
 
 // Where to look for agents. In Docker/Kubernetes, set AGENT_URLS to their service addresses.
-const AGENT_URLS = (process.env.AGENT_URLS ?? "http://localhost:4001,http://localhost:4002")
-  .split(",")
-  .map((url) => url.trim())
-  .filter(Boolean);
+// Read when it is used, not when the file is loaded, so tests can point it at their own agents.
+function agentUrls(): string[] {
+  return (process.env.AGENT_URLS ?? "http://localhost:4001,http://localhost:4002")
+    .split(",")
+    .map((url) => url.trim())
+    .filter(Boolean);
+}
 
 // Fetch every agent's card. An agent that isn't running is skipped with a warning.
 export async function discoverAgents(): Promise<KnownAgent[]> {
   const factory = new ClientFactory();
+  const AGENT_URLS = agentUrls();
 
   const results = await Promise.allSettled(
     AGENT_URLS.map(async (url) => {

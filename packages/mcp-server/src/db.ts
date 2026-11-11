@@ -1,9 +1,9 @@
 import pg from "pg";
 
 if (!process.env.ANALYST_DATABASE_URL) {
-  // console.error, never console.log: stdout is reserved for MCP messages (see index.ts)
-  console.error("ANALYST_DATABASE_URL is not set. Pass --env-file with the full path to .env");
-  process.exit(1);
+  // Thrown, not process.exit: the error goes to stderr and the process still stops with an error,
+  // but importing this file in a test can't kill the test runner. (Never stdout: it is reserved for MCP messages.)
+  throw new Error("ANALYST_DATABASE_URL is not set. Pass --env-file with the full path to .env");
 }
 
 // Same read-only login as the analyst: the MCP server can look, never change
