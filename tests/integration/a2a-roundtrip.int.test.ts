@@ -139,37 +139,48 @@ describe("a question travelling through the whole chain", () => {
 
 describe("when the AI writes bad SQL, the agent refuses and the data is safe", () => {
   it.each([
-    ["a DELETE", "DELETE FROM transactions", /Only SELECT queries are allowed/],
-    ["two statements", "SELECT 1; DROP TABLE transactions", /Only one SQL statement is allowed/],
-    [
-      "a DELETE hidden in a WITH",
-      "WITH g AS (DELETE FROM transactions RETURNING *) SELECT * FROM g",
-      /data-modifying|read-only|permission denied/i,
-    ],
-  ])("%s", async (_name, sql, reason) => {
+    ["a DELETE", "DELETE FROM transactions"],
+    ["two statements", "SELECT 1; DROP TABLE transactions"],
+    ["a DELETE hidden in a WITH", "WITH g AS (DELETE FROM transactions RETURNING *) SELECT * FROM g"],
+  ])("%s", async (_name, sql) => {
     await loadFixture();
     model.writeSql.mockResolvedValue(sql);
 
     const events = await ask("hej");
 
-    // The agent tells the orchestrator why, as its answer. No SQL or rows are passed on.
-    expect(events.map((e) => e.type)).toEqual(["agents", "route", "answer"]);
-    const answer = events.at(-1) as { text: string };
-    expect(answer.text).toMatch(/^Jag kunde inte svara: /);
-    expect(answer.text).toMatch(reason);
+    // The visitor gets a general message. SQL and rows are not passed on, and the AI is not asked to explain.
+    expect(events).toEqual([
+      { type: "agents", names: ["Koll Analyst"] },
+      { type: "route", agent: "Koll Analyst", reason: "En fråga om utgifter." },
+      { type: "answer", text: "Jag kunde inte svara på den frågan. Försök igen." },
+    ]);
     expect(model.explain).not.toHaveBeenCalled();
     expect(await countRows("transactions")).toBe(20);
   });
 
-  it("passes on the reason when the AI itself fails (for example the daily limit)", async () => {
-    model.writeSql.mockRejectedValue(new Error("Daily Gemini limit reached (100 calls)"));
+  it("tells the visitor when the daily limit is reached, without internal details", async () => {
+    model.writeSql.mockRejectedValue(
+      new Error("Daily Gemini limit reached (100 calls). Raise GEMINI_DAILY_LIMIT in .env."),
+    );
 
     const events = await ask("hej");
 
     expect(events.at(-1)).toEqual({
       type: "answer",
-      text: "Jag kunde inte svara: Daily Gemini limit reached (100 calls)",
+      text: "Dagens gräns för AI-anrop är nådd. Försök igen imorgon.",
     });
+  });
+
+  it("never shows the visitor technical details, only the server log gets them", async () => {
+    const log = vi.spyOn(console, "error");
+    model.writeSql.mockRejectedValue(new Error("connect ECONNREFUSED db:5432 (project koll-123456)"));
+
+    const events = await ask("hej");
+
+    const answer = events.at(-1) as { text: string };
+    expect(answer.text).toBe("Jag kunde inte svara på den frågan. Försök igen.");
+    expect(JSON.stringify(events)).not.toMatch(/ECONNREFUSED|db:5432|koll-123456/);
+    expect(log).toHaveBeenCalledWith("[analyst]", "connect ECONNREFUSED db:5432 (project koll-123456)");
   });
 });
 
