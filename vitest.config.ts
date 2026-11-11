@@ -1,5 +1,5 @@
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vitest/config";
+import { configDefaults, defineConfig } from "vitest/config";
 
 /*
   One test run, two environments ("projects"):
@@ -15,6 +15,8 @@ export default defineConfig({
           name: "node",
           environment: "node",
           include: ["{agents,packages}/*/tests/**/*.test.ts"],
+          // Needs Docker: run by `npm run test:integration`
+          exclude: [...configDefaults.exclude, "**/*.int.test.ts"],
         },
       },
       {

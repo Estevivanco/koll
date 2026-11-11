@@ -31,3 +31,16 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - run: docker build -t koll:ci .
+
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # Starts its own throwaway Postgres with Docker, which is already installed on the runner
+      - run: npm run test:integration
