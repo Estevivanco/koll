@@ -1,13 +1,13 @@
 {
-    "name": "@koll/importer",
-    "version": "0.0.0",
-    "type": "module",
-    "dependencies": {
-        "@koll/shared": "*",
-        "csv-parse": "^7.0.3",
-        "pg": "^8.23.1"
-    },
-    "devDependencies": {
-        "@types/pg": "^8.23.1"
-    }
+  "name": "@koll/importer",
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "@koll/shared": "*",
+    "csv-parse": "^7.0.3",
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.23.1"
+  }
 }

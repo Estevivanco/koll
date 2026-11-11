@@ -1,16 +1,16 @@
 {
-    "name": "@koll/categorizer",
-    "version": "0.0.0",
-    "type": "module",
-    "dependencies": {
-        "@a2a-js/sdk": "^1.3.0",
-        "@google/genai": "^2.31.0",
-        "@koll/shared": "*",
-        "pg": "^8.23.1",
-        "@koll/a2a": "*",
-        "@koll/budget": "*"
-    },
-    "devDependencies": {
-        "@types/pg": "^8.23.1"
-    }
+  "name": "@koll/categorizer",
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "@a2a-js/sdk": "^1.3.0",
+    "@google/genai": "^2.31.0",
+    "@koll/shared": "*",
+    "pg": "^8.23.1",
+    "@koll/a2a": "*",
+    "@koll/budget": "*"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.23.1"
+  }
 }

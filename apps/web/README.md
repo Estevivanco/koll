@@ -56,13 +56,13 @@ Rule of thumb: if only one section uses it, it lives in that section's folder. W
 
 Five colors, no gradients. Everything else is a tint made by mixing these in `styles/tokens.css`.
 
-| Role | Color | Used for |
-|---|---|---|
-| Ink | `#0e1512` | page background |
-| Paper | `#ece8dd` | text |
-| Green | `#199e70` | primary accent: buttons, the prompt, chart data |
+| Role  | Color     | Used for                                          |
+| ----- | --------- | ------------------------------------------------- |
+| Ink   | `#0e1512` | page background                                   |
+| Paper | `#ece8dd` | text                                              |
+| Green | `#199e70` | primary accent: buttons, the prompt, chart data   |
 | Amber | `#c98500` | notices, the "demo data" badge, the Gemini marker |
-| Blue | `#3987e5` | agents |
+| Blue  | `#3987e5` | agents                                            |
 
 The chart colors were checked with the data-visualization palette validator (contrast, colorblind separation) against the card background `#161d19`. Chart rules used here:
 

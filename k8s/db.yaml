@@ -56,7 +56,7 @@ spec:
           # Kubernetes only sends traffic here once Postgres accepts connections
           readinessProbe:
             exec:
-              command: ["sh", "-c", "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""]
+              command: ["sh", "-c", 'pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"']
             periodSeconds: 5
       volumes:
         - name: data
