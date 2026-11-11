@@ -16,4 +16,6 @@
 | `PRESSBYRAN`                                              | 1 row, 48 kr                      |
 | `Sparkonto` (transfers, 2 000 kr the 28th of every month) | 3 rows, 6 000 kr                  |
 
+Charged in 3 different months (what the MCP `recurring_payments` tool finds): `Sparkonto`, `ICA MAXI`, `SPOTIFY` and `ESPRESSO HOUSE`. `CIRCLE K` (2 months) and `PRESSBYRAN` (1) are not.
+
 If you change the CSV, change this table and the tests that use it.
