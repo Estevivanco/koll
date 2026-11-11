@@ -56,7 +56,9 @@ export function parseSwedbank(text: string): Transaction[] {
 
 function toTransaction(row: SwedbankRow): Transaction {
   const date = row.transactionDate;
-  const amount = Number(row.amount.replace(/\s/g, "").replace(",", "."));
+  const amountText = row.amount.replace(/\s/g, "").replace(",", ".");
+  // Number("") is 0, so an empty amount has to be caught before converting
+  const amount = amountText === "" ? NaN : Number(amountText);
   const counterparty = fixSwedish(row.description);
   const description = fixSwedish(row.reference);
 

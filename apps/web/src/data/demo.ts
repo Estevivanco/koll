@@ -87,7 +87,7 @@ export const MONTHS: MonthDetail[] = [
     short: "Oct",
     partial: true,
     income: 24500,
-    transactions: 34,
+    transactions: 30,
     byRules: 0.35,
     categories: [
       { category: "Boende", spent: 7500, count: 1 },

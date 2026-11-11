@@ -129,7 +129,16 @@ describe("parseSwedbank", () => {
       expect(() => parseSwedbank(csv(line({ date: "" })))).toThrow(/Bad row/);
     });
 
-    // Number("") is 0, so an empty amount slips through as 0 kr instead of being rejected.
-    it.todo("throws when the amount is empty (today it is read as 0)");
+    it("throws when the amount is empty (not read as 0 kr)", () => {
+      expect(() => parseSwedbank(csv(line({ amount: "" })))).toThrow(/Bad row/);
+    });
+
+    it("throws when the amount is only spaces", () => {
+      expect(() => parseSwedbank(csv(line({ amount: "   " })))).toThrow(/Bad row/);
+    });
+
+    it("still reads a real 0,00 amount", () => {
+      expect(parseSwedbank(csv(line({ amount: "0,00" })))[0].amount).toBe(0);
+    });
   });
 });

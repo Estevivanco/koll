@@ -20,16 +20,12 @@ describe("totalSpent", () => {
 
 // The website shows these numbers side by side, so they have to agree with each other
 describe("demo data", () => {
-  it.each(MONTHS.filter((m) => m.id !== "2026-10").map((m) => [m.label, m] as const))(
+  it.each(MONTHS.map((m) => [m.label, m] as const))(
     "%s: the category counts add up to the transaction count",
     (_label, month) => {
       expect(month.categories.reduce((sum, c) => sum + c.count, 0)).toBe(month.transactions);
     },
   );
-
-  // October says 34 transactions, but its categories add up to 30. Fix the numbers in demo.ts, then
-  // remove the filter above and this todo.
-  it.todo("October 2026: the category counts add up to the transaction count");
 
   it("has a trend point for every month, with the same totals", () => {
     for (const month of MONTHS) {
