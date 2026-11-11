@@ -6,6 +6,7 @@ import {
 } from "@a2a-js/sdk/server";
 import { createMessage, dataPart, readText, textPart } from "@koll/a2a";
 import { answerQuestion } from "./answer.js";
+import { friendlyError } from "./friendly-error.js";
 
 export class AnalystExecutor implements AgentExecutor {
   async execute(context: RequestContext, eventBus: ExecutionEventBus): Promise<void> {
@@ -17,8 +18,7 @@ export class AnalystExecutor implements AgentExecutor {
       // Send the SQL and rows too, so the caller can show how the answer was found
       reply = createMessage("agent", [textPart(answer), dataPart({ sql, rows })], context.contextId);
     } catch (error) {
-      const reason = error instanceof Error ? error.message : String(error);
-      reply = createMessage("agent", [textPart(`Jag kunde inte svara: ${reason}`)], context.contextId);
+      reply = createMessage("agent", [textPart(friendlyError(error))], context.contextId);
     }
 
     eventBus.publish(AgentEvent.message(reply));

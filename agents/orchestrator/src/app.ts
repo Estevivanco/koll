@@ -8,18 +8,37 @@ import type { AskEvent } from "./events.js";
 
 const MAX_QUESTION_LENGTH = 200;
 
+// How many proxies (load balancer, ingress) sit in front of the server. 0 = none: the visitor's address
+// is the connection's own. Only a number is accepted: "true" would let anyone fake their address with an
+// X-Forwarded-For header and get a fresh question limit every time.
+export function parseTrustProxy(value: string | undefined): number {
+  if (value === undefined || value.trim() === "") return 0;
+  if (!/^\d+$/.test(value.trim())) {
+    throw new Error(
+      `TRUST_PROXY must be the number of proxies in front of the server (for example 1), not "${value}".`,
+    );
+  }
+  return Number(value);
+}
+
 export type AppOptions = {
   // How the question is answered. Tests pass a fake, so no agents or Gemini are needed.
   ask?: (question: string) => AsyncIterable<AskEvent>;
   // Every question costs up to 3 Gemini calls, so limit how many one visitor can ask
   limitPerHour?: number;
+  // Number of proxies in front of the server (see parseTrustProxy). Decides which address counts as "the visitor".
+  trustProxy?: number;
 };
 
 export function createApp({
   ask = askOrchestrator,
   limitPerHour = Number(process.env.ASK_LIMIT_PER_HOUR ?? 20),
+  trustProxy = parseTrustProxy(process.env.TRUST_PROXY),
 }: AppOptions = {}) {
   const app = express();
+  // Behind a proxy every request seems to come from the proxy, so the limit would be shared by all visitors.
+  // Trusting exactly N proxies makes Express read the visitor's address from X-Forwarded-For at that depth.
+  if (trustProxy > 0) app.set("trust proxy", trustProxy);
   // Questions are short: anything bigger than 2 KB is refused before we read it
   app.use(express.json({ limit: "2kb" }));
 
