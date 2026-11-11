@@ -29,6 +29,7 @@ const MANGLED_WORDS: Record<string, string> = {
   "SKADEF�RS": "SKADEFÖRS",
   "Str�msn": "Strömsn",
   "L�n": "Lön",
+  "Kortk�p": "Kortköp"
 };
 
 function fixSwedish(text: string): string {
