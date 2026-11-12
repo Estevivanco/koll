@@ -7,7 +7,7 @@ export default defineConfig(
   js.configs.recommended,
   tseslint.configs.recommended,
   // Alone in its object so it stays a global ignore
-  { ignores: ["**/dist/**", "**/node_modules/**"] },
+  { ignores: ["**/dist/**", "**/node_modules/**", "**/test-results/**", "**/playwright-report/**"] },
   // Hook rules only apply to the React app
   { files: ["apps/web/**/*.{ts,tsx}"], ...reactHooks.configs.flat.recommended },
 );

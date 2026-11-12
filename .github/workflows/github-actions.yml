@@ -44,3 +44,26 @@ jobs:
       - run: npm ci
       # Starts its own throwaway Postgres with Docker, which is already installed on the runner
       - run: npm run test:integration
+
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      # Opens the built website in a real browser (demo mode: made-up data, no backend, no Gemini)
+      - run: npm run test:e2e
+      # When something fails, the report has a screenshot and a step-by-step trace to look at
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            apps/web/playwright-report/
+            apps/web/test-results/
+          retention-days: 7
