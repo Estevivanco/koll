@@ -39,7 +39,7 @@ export function Overview() {
         <StatTile label="Income" value={formatKr(month.income)} detail="salary" />
         <StatTile
           label="Left over"
-          value={formatKr(month.income)}
+          value={formatKr(month.income - spent)}
           detail={`${formatPercent(month.income - spent, month.income)} of income`}
         />
         <StatTile

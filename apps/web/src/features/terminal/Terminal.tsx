@@ -27,7 +27,7 @@ export function Terminal() {
         autoplayed.current = true;
         observer.disconnect();
         past.current.push(EXAMPLE_QUESTIONS[0]);
-        void submit(EXAMPLE_QUESTIONS[1]);
+        void submit(EXAMPLE_QUESTIONS[0]);
       },
       { threshold: 0.6 },
     );
@@ -151,7 +151,7 @@ export function Terminal() {
             autoComplete="off"
             autoCapitalize="off"
             spellCheck={false}
-            readOnly={false}
+            readOnly={busy}
           />
           <button type="submit" className={styles.run} disabled={busy || !draft.trim()}>
             Run ↵
