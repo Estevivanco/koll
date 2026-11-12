@@ -1,0 +1,42 @@
+#!/bin/bash
+# Runs after `git pull` or `git merge` finishes. When you pull main after merging a PR on GitHub,
+# this rebuilds and restarts the containers, but only if something that goes into the image changed.
+#
+# Turn it on once:   git config core.hooksPath .githooks
+# Turn it off:       git config --unset core.hooksPath
+# Skip it once:      KOLL_SKIP_REBUILD=1 git pull
+# Try it safely:     KOLL_REBUILD_DRY_RUN=1 .githooks/post-merge
+#
+# A failure here never undoes the pull: git ignores this hook's exit code.
+
+[ -n "$KOLL_SKIP_REBUILD" ] && exit 0
+
+# Only on main. Pulling a feature branch should not touch your running containers.
+[ "$(git rev-parse --abbrev-ref HEAD)" = "main" ] || exit 0
+
+# What the pull changed: git remembers where HEAD was before in ORIG_HEAD
+changed=$(git diff --name-only ORIG_HEAD HEAD 2>/dev/null)
+
+# Only what ends up in the image (see Dockerfile and docker-compose.yml). Tests and docs do not.
+relevant=$(echo "$changed" | grep -E '^(Dockerfile|docker-compose\.yml|\.dockerignore|package\.json|package-lock\.json|tsconfig\.base\.json)$|^(agents|packages)/' | grep -vE '/tests/|\.md$')
+
+if [ -z "$relevant" ]; then
+  echo "post-merge: nothing that goes into the Docker image changed, no rebuild."
+  exit 0
+fi
+
+echo "post-merge: these changes go into the image:"
+echo "$relevant" | sed 's/^/  /'
+
+if [ -n "$KOLL_REBUILD_DRY_RUN" ]; then
+  echo "post-merge: dry run, would run: docker compose up -d --build"
+  exit 0
+fi
+
+if ! docker info >/dev/null 2>&1; then
+  echo "post-merge: Docker is not running, so no rebuild. Start Docker and run: docker compose up -d --build"
+  exit 0
+fi
+
+echo "post-merge: running docker compose up -d --build ..."
+docker compose up -d --build
